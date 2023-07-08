@@ -1,15 +1,15 @@
 /**************************************************************************************************************************************************************
-----------------------------Data Prep 2011--------------------------------------
+----------------------------Data Prep 2001--------------------------------------
 
-Name: 					data_prep_2011.do
-Description: 			This file processes 2011 DHS for Uganda & prepares the clean/tidy dataset 
-Time Period:			Years = 2011 (GPS data available for 2016)	
-Date last modified:		July 08, 2023
+Name: 					data_prep_2001.do
+Description: 			This file processes 2006 DHS for Uganda & prepares the clean/tidy dataset 
+Time Period:			Years = 2001 (GPS data available for 2001)	
+Date last modified:		July 09, 2023
 
 
 Notes:
-1. Check men's data again since smaller number is matching PR data
-2. m:1 not working with geo-spatial data file, so disabled (working for all others)
+1. 
+2. 
 3. 
 4.
 
@@ -17,9 +17,9 @@ Notes:
 
 *Elegible Women Dataset - IR
 
-use "${irdata2011}.dta", clear
+use "${irdata2001}.dta", clear
 
-keep caseid v000 v001 v002 v003 v004 v005 v006 v007 v008  v042 v455 v457 v208 m45_1 m46_1 v213 b3_01 v012 v024 v025 v101 v102 v106 v107 v133 v131 v716 v717 v714 v705 v719 v440 v444a v445 v446 v439 v150 v151 v152 v501 v130 v131 m18_* m19_*  v190
+keep caseid v000 v001 v002 v003 v004 v005 v006 v007 v008  v042 v455 v457 v208 m45_1 m46_1 v213 b3_01 v012 v024 v025 v101 v102 v106 v107 v133 v131 v716 v717 v714 v705 v719 v440 v444a v445 v446 v439 v150 v151 v152 v501 v130 v131 m18_* m19_*  
 
 sort v001 v002 v003
 
@@ -44,11 +44,11 @@ tab v717, g(occ)
 bysort hhid: egen tot_wmen_un=sum(occ1) 
 bysort hhid: egen tot_wmen_prof=sum(occ2)
 bysort hhid: egen tot_wmen_cler=sum(occ3)
-bysort hhid: egen tot_wmen_agri_1=sum(occ4)
-bysort hhid: egen tot_wmen_agri_2=sum(occ5)
-bysort hhid: egen tot_wmen_serv=sum(occ6)
+bysort hhid: egen tot_wmen_serv=sum(occ4)
+bysort hhid: egen tot_wmen_agri=sum(occ5)
+bysort hhid: egen tot_wmen_skman=sum(occ6)
+bysort hhid: egen tot_wmen_uskman=sum(occ7)
 
-egen tot_wmen_agri = rowtotal(tot_wmen_agri_1 tot_wmen_agri_2)
 
 
 sum tot_wmen_agri
@@ -57,7 +57,8 @@ lab var tot_wmen_un "Number of women in the HH - unemployed"
 lab var tot_wmen_prof "Number of women in the HH - Professional jobs"
 lab var tot_wmen_cler "Number of women in the HH - Clerical jobs"
 lab var tot_wmen_serv "Number of women in the HH - services employment"
-
+lab var tot_wmen_skman "Number of women in the HH - skilled manual employment"
+lab var tot_wmen_uskman "Number of women in the HH - unskilled manual employment"
 
 * Currently working
 tab v714
@@ -65,8 +66,8 @@ bysort hhid: egen tot_wmen_work=sum(v714)
 bysort hhid: egen tot_wmen_work_hd=sum(v714) if v150==1
 
 *HH head occupation 
-bysort hhid: g x = tot_wmen_agri==1 & v150==1
-replace x = . if tot_wmen_agri == . 
+bysort hhid: g x = occ5==1 & v150==1
+replace x = . if occ5 == . 
 bysort hhid: egen head_ag_wm= max(x)
 drop x
 
@@ -172,13 +173,13 @@ check_age_variable
 
 
 
-sum v446
-codebook v446
-tab v446, nolabel
-tab v445
-foreach var of varlist v445 v446 {
-replace `var' =. if `var'==9998 | `var'==9999
-}
+	sum v446
+	codebook v446
+	tab v446, nolabel
+	tab v445
+	foreach var of varlist v445 v446 {
+	replace `var' =. if `var'==9998 | `var'==9999
+	}
 
 * RI creation
 g RI_Low_w=1 if v446<=1190 //RI for low and very low//
@@ -252,17 +253,16 @@ sum
 order hhid v001 v002
 sort hhid 
 
-save "$dta/HHwomen_2011.dta", replace
+save "$dta/HHwomen_2001.dta", replace
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 
 * Mens' Dataset - MR    
 
+use "$mrdata2001.dta", clear
 
-use "$mrdata2016.dta", clear
-
-keep mcaseid mv000 mv001 mv002 mv003 mv004 mv005 mv006 mv007 mv008 mv008a mv012 mv024 mv025 mv101 mv102 mv106 mv107 mv133 mv131 mv717 mv714 mv150 mv151 mv152 mv501 mv130  
+keep mcaseid mv000 mv001 mv002 mv003 mv004 mv005 mv006 mv007 mv008  mv012 mv024 mv025 mv101 mv102 mv106 mv107 mv133 mv131 mv717 mv714 mv150 mv151 mv152 mv501 mv130  
 
 * ID
 tostring mv001 mv002,g (v001s v002s)
@@ -285,26 +285,25 @@ drop n
 
 tab mv717, g(occ)
 
+
+
 bysort hhid: egen tot_men_ag=sum(occ5)
 sum tot_men_ag
 
-lab var tot_men_ag "Number of men in agri-self-employed"
+lab var tot_men_ag "Number of men in agri-employed"
 
 *Other occupations
 bysort hhid: egen tot_men_un=sum(occ1)
 bysort hhid: egen tot_men_prof=sum(occ2)
 bysort hhid: egen tot_men_cler=sum(occ3)
 bysort hhid: egen tot_men_sales=sum(occ4)
-bysort hhid: egen tot_men_dom=sum(occ6)
-bysort hhid: egen tot_men_serv=sum(occ7)
-bysort hhid: egen tot_men_skman=sum(occ8)
-bysort hhid: egen tot_men_uskman=sum(occ9)
+bysort hhid: egen tot_men_skman=sum(occ6)
+bysort hhid: egen tot_men_uskman=sum(occ7)
 
 lab var tot_men_un "Number of men in the HH - unemployed"
 lab var tot_men_prof "Number of men in the HH - Professional jobs"
 lab var tot_men_cler "Number of women in the HH - Clerical jobs"
 lab var tot_men_sales "Number of men in the HH - sales employment"
-lab var tot_men_serv "Number of men in the HH - services employment"
 lab var tot_men_skman "Number of men in the HH - skilled manual employment"
 lab var tot_men_uskman "Number of women in the HH - unskilled manual employment"
 
@@ -314,14 +313,9 @@ bysort hhid: egen tot_men_work=sum(mv714)
 bysort hhid: egen tot_men_work_hd=sum(mv714) if mv150==1
 
 *HH head occupation 
-bysort hhid: gen x = (occ5==1) & mv150==1
+bysort hhid: gen x = (occ5==1 ) & mv150==1
 replace x = . if (occ5==. )
 bysort hhid: egen head_ag_m=max (x)
-drop x
-
-bysort hhid: g x = occ6==1 & mv150==1
-replace x = . if occ6 == .
-bysort hhid: egen head_dom_m=max (x)
 drop x
 
 bysort hhid: g x= occ1==1 & mv150==1
@@ -344,19 +338,9 @@ replace x = . if occ4== .
 bysort hhid: egen head_sales_m=max (x)
 drop x
 
-bysort hhid: g x = occ7==1 & mv150==1
-replace x = . if occ7== .
-bysort hhid: egen head_serv_m=max (x)
-drop x
-
-bysort hhid: g x= occ8==1 & mv150==1
-replace x = . if occ8== .
+bysort hhid: g x= occ6==1 & mv150==1
+replace x = . if occ6== .
 bysort hhid: egen head_skman_m=max (x)
-drop x
-
-bysort hhid: g x= occ9==1 & mv150==1
-replace x = . if occ9== .
-bysort hhid: egen head_uskman_m=max (x)
 drop x
 
 lab var tot_men_work "Number of men currently working in the HH"
@@ -368,9 +352,7 @@ lab var head_un_m "Male head in the HH - unemployed"
 lab var head_prof_m "Male head in the HH - Professional"
 lab var head_cler_m "Male head in the HH - Clerical"
 lab var head_sales_m "Male head in the HH - sales employment"
-lab var head_serv_m "Male head in the HH - services employment"
 lab var head_skman_m "Male head in the HH - skilled manual employment"
-lab var head_uskman_m "Male head in the HH - unskilled manual employment"
 
 * Education
 tab mv106, g(edu)
@@ -420,7 +402,7 @@ sum
 
 order hhid v001 v002
 
-save "$dta/HHmen_2011.dta", replace
+save "$dta/HHmen_2001.dta", replace
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
@@ -428,10 +410,9 @@ save "$dta/HHmen_2011.dta", replace
 ********************************************************************************
 * Household members - PR for FOOD SECURITY
 ********************************************************************************
-use "$prdata2011.dta", clear
+use "$prdata2001.dta", clear
 
-
-keep hhid hvidx hv001 hv002 hv003 hv004 hv005 hv007 hv021 hv022 hv023 hv024 hv025  hv101 hv103 hv104 hv105 hv106 hv107 hv270 hv271  hc57 hv006 hv007 hv008 hv009 hv220 hv219 hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 ha5 ha11 hc1 hc56 hc70 hc71 hc72 hc73 
+keep hhid hvidx hv001 hv002 hv003 hv004 hv005 hv007 hv021 hv022 hv023 hv024 hv025  hv101 hv103 hv104 hv105 hv106 hv107   hv006 hv007 hv008 hv009 hv220 hv219 hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 ha5 ha11 hc1 hc55 hc56 hc57 hc5 hc8 hc11  
 
 gen v001 = hv001
 gen v002 = hv002
@@ -451,28 +432,27 @@ drop v001s v002s
 
 
 * STUNTING
-tab hc70, nolabel
-tab hc71, nolabel
-tab hc72, nolabel
+tab hc5, nolabel
+tab hc8, nolabel
+tab hc11, nolabel
 
-foreach var of varlist hc70 hc71 hc72 {
+foreach var of varlist hc5 hc8 hc11 {
 replace `var' =. if `var'==9998 |`var'==9996 | `var'==9997 |`var'==9999
 }
 
-
-tab hc70
-gen stunted_ch = 1 if hc70<=-200
-replace stunted_ch=0 if hc70>-200
-replace stunted_ch= . if hc70==.
+tab hc5
+gen stunted_ch = 1 if hc5<=-200
+replace stunted_ch=0 if hc5>-200
+replace stunted_ch= . if hc5==.
 tab stunted_ch
 * count if hc70 <-200
 bysort hhid: egen stunting_c_hh=total(stunted_ch), missing 
 lab var stunting_c_hh "Number of stunted children in the HH"
 
 * WASTING
-gen wasted_ch = 1 if hc72<=-200
-replace wasted_ch=0 if hc72>-200
-replace wasted_ch = . if hc72==.
+gen wasted_ch = 1 if hc11<=-200
+replace wasted_ch=0 if hc11>-200
+replace wasted_ch = . if hc11==.
 tab wasted_ch
 * count if hc72 <-200
 bysort hhid: egen wasted_c_hh=total(wasted_ch) , missing
@@ -480,9 +460,9 @@ lab var wasted_c_hh "Number of wasted children in the HH"
 
 
 * UNDERWWEIGHT
-gen underwht_ch = 1 if hc71<=-200
-replace underwht_ch=0 if hc71>-200
-replace underwht_ch = . if hc71==.
+gen underwht_ch = 1 if hc8<=-200
+replace underwht_ch=0 if hc8>-200
+replace underwht_ch = . if hc8==.
 tab underwht_ch
 bysort hhid: egen underwht_ch_hh=total(underwht_ch) , missing
 lab var underwht_ch_hh "Number of underweighted children in the HH"
@@ -496,7 +476,6 @@ replace nt_ch_sev_anem=. if hc56==.
 label var nt_ch_sev_anem "Moderate/severe anemia - child 6-59 months"
 bysort hhid: egen anemia_ch_hh=total(nt_ch_sev_anem), missing 
 label var anemia_ch_hh "Moderate/severe anemia HH - child 6-59 months"
-
 
 * Sex
 tab hv104, g(sex)
@@ -526,7 +505,7 @@ collapse  v003  hv001 hv002 hv003 hv009 hv206 tot_men_HH tot_wmen_HH tot_teen15 
 
 sort hhid
 
-save "$dta/HH_2011.dta", replace
+save "$dta/HH_2001.dta", replace
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
@@ -534,17 +513,17 @@ save "$dta/HH_2011.dta", replace
 * Children data for FOOD DIVERSITY AND FREQUENCY
 ********************************************************************************
 
-use "$krdata2011.dta", clear
+use "$krdata2001.dta", clear
 
 gen age_in_months = v008 - b3
 sum age_in_months //ok   < 60 months
 
-keep if b9 == 0 & age_in_months < 24    							//4,913 children
+keep if b9 == 0 & age_in_months < 24    							//5227 children
 
 gsort caseid age_in_months
 * and keep the last born of those.
 * if caseid is the same as the prior case, then not the last born
-keep if _n== 1 | caseid != caseid[_n-1]                        //118 deleted
+keep if _n== 1 | caseid != caseid[_n-1]                        //106 deleted
 
 *ID
 tostring v001 v002, g(v001s v002s)
@@ -566,15 +545,13 @@ lab var hh_young_ch "youngest children living with their mother"
 
 ***children who are fed with milk products or are breastfeeding Milk or milk products two or more times during the day or night preceding the survey or are breastfeeding.
 
-tab v411 //
-tab v411a //
-tab v414p //
+*tab v411 //
+*tab v414p //
 
 replace v469e =.  if v469e == 8     //missing 
-replace v469f = . if v469f == 8     //missing 
-replace v469x = . if v469x == 8		//missing 
+replace v469h = . if v469f == 8     //missing 
 
-egen dairy_prod_amount = rowtotal(v469e v469f v469x), missing
+egen dairy_prod_amount = rowtotal(v469e v469h), missing
 label var dairy_prod_amount "Number of times child had dairy product"
 gen dairy_prod = 0
 replace dairy_prod = 1 if dairy_prod_amount >= 2
@@ -582,8 +559,6 @@ replace dairy_prod = . if dairy_prod_amount ==.
 label var dairy_prod "1=Dairy given more than once versus 0=dairy given once"
 label define dairy_prod 1 "Child had diary more than once" 0 "Child had dairy once"
 label values dairy_prod dairy_prod
-
-
 
 gen breast_or_subsidies = 0
 replace breast_or_subsidies = 1 if dairy_prod == 1 | m4 == 95
@@ -594,43 +569,45 @@ label values breast_or_subsidies breast_or_subsidies
 
 *consumed in the last 24 hours
 
-gen grains_oth = v414e == 1 | v412b == 1   
-replace grains_oth = . if v414e == .
+gen grains_oth = v470q == 1   
+replace grains_oth = . if v470q == .
 label var grains_oth "Child had grains (Local grains, tubers)"
 label define grains_oth 1 "Child had grains" 0 "Had none"
 label values grains_oth grains_oth
 tab grains_oth, m
 
-gen legume_nuts = v414o == 1   
-replace legume_nuts = . if v414o == .
+gen legume_nuts = v470w == 1   
+replace legume_nuts = . if v470w == .
 label var legume_nuts "Child had food (lentils, beans, peas, nuts)"
 label define legume_nuts 1 "Child had lentils, beans, peas, nuts" 0 "Had none"
 label values legume_nuts legume_nuts
 tab legume_nuts, m
 
-gen dairy_products =  dairy_prod ~= 0
-replace dairy_products = . if   dairy_prod ==. 
+gen dairy_products = .
+replace dairy_products = 1 if (v469e ==1 | v469h == 1)
+replace dairy_products = 0 if (v469e ==0 | v469h == 0)
 label var dairy_products "Child had food (milk, formula, yogurt etc)"
 label define dairy_products 1 "Child had milk, formular, yoghurt" 0 "Had none"
 label values dairy_products dairy_products
 tab dairy_products, m
 
-gen flesh_food = v414h == 1 | v414m == 1 | v414g == 1  //NA
-replace flesh_food = . if v414h == .
+gen flesh_food = v470v == 1 
+replace flesh_food = . if v470v == .
 label var flesh_food "Child had food (meat, and fish, eggs)"
 label define flesh_food 1 "Child had meat, eggs, and fish" 0 "Had none"
 label values flesh_food flesh_food
 tab flesh_food, m
 
-gen vitamin_food = v414k == 1 | v414l == 1   //na
-replace vitamin_food = . if v414k  == . & v414l == . 
+gen vitamin_food = v470o == 1 
+replace vitamin_food = . if v470o  == . 
 label var vitamin_food "Child had food (Vitamin rich foodh)"
 label define vitamin_food 1 "Child had Vitamin rich food" 0 "Had none"
 label values vitamin_food vitamin_food
 tab vitamin_food
 
-gen oth_fruit_veg = v414f == 1 | v414i == 1 |v414j  == 1    //na
-replace oth_fruit_veg = . if v414f == . & v414i  == . & v414j == .
+
+gen oth_fruit_veg = v470u == 1 
+replace oth_fruit_veg = . if v470u == . 
 label var oth_fruit_veg "Child had food (fruit and vegies)"
 label define oth_fruit_veg 1 "Child had fruit and vegies" 0 "Had none"
 label values oth_fruit_veg oth_fruit_veg
@@ -662,7 +639,7 @@ label var not_inf_min_breast "Household with children (age >=9 months) breastfee
 
 *for not breastfeeding child
 *dairy_prod_amount m39 = both are times kids are fed - dairy_prod_amount not in 2008 (we have only yes no options)
-
+/*
 egen min_food_help = rowtotal (dairy_prod_amount m39) if (m39 >=1 & m39<=7  & age_in_months < 6)
 replace min_food_help=0 if m39==0 & dairy_prod_amount==0
 gen min_no_breast = .
@@ -674,7 +651,7 @@ egen min_meal_freq = rowtotal (inf_min_breast not_inf_min_breast min_no_breast),
 gen No_min_meal_freq =  min_meal_freq ==0
 bys hhid : egen No_min_meal_freq_hh = max(No_min_meal_freq)
 la var No_min_meal_freq_hh "HH has at least one young child that is not fed min frequency"
-
+*/
 gen No_min_diet_diversity =  min_diet_diversity ==0
 bys hhid : egen No_min_diet_diversity_hh = max(No_min_diet_diversity)
 la var No_min_diet_diversity_hh "HH has at least one young child that is not fed with the min food diversity"
@@ -686,13 +663,13 @@ replace Meal_freq_hh=0 if Meal_freq_hh==.
 
 count
 sort hhid
-collapse (max) hh_young_ch  min_diet_diversity No_min_diet_diversity_hh No_min_meal_freq inf_min_breast not_inf_min_breast, by (hhid v001 v002 v007)
+collapse (max) hh_young_ch  min_diet_diversity No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast, by (hhid v001 v002 v007)
    
-save "$dta/food_2011.dta", replace
+save "$dta/food_2001.dta", replace
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
-use "$krdata2011.dta", clear
+use "$krdata2001.dta", clear
 
 // Child's age 
 
@@ -716,61 +693,62 @@ order hhid
 
 
 // Given formula
-gen nt_formula = v411a==1 
-replace nt_formula = . if v411a == .
+gen nt_formula = v470f==1 
+replace nt_formula = . if v470f == .
 label var nt_formula "Child given infant formula in day/night before survey - last-born under 2 years"
 
+/*
 // Give fortified baby food
 gen nt_bbyfood= v412a==1
 label var nt_bbyfood "Child given fortified baby food in day/night before survey- last-born under 2 years"
-
+*/
 
 // Given other fresh animal milk
-gen nt_milk = v411 == 1          
-replace nt_milk = . if v411 == .
+gen nt_milk = v470h == 1          
+replace nt_milk = . if v470h == .
 label var nt_milk "Child given other milk in day/night before survey- last-born under 2 years"
 
 // Given grains & tubers
-gen nt_grains_tuber = v414e == 1 
-replace nt_grains_tuber = . if (v414e == .)
+gen nt_grains_tuber = v470q == 1 
+replace nt_grains_tuber = . if (v470q == .)
 label var nt_grains_tuber "Child given grains in day/night before survey- last-born under 2 years"
 
 
 // Given Vit rich foods
-gen nt_vit =  v414k == 1 | v414l == 1 
-replace nt_vit = . if(v414k == . | v414l == .)
+gen nt_vit =  v470o == 1 
+replace nt_vit = . if(v470o == .)
 label var nt_vit "Child given vitamin A rich food in day/night before survey- last-born under 2 years"
 
 *Given other fruits or vegetables
 
-gen  nt_frtveg = v414f == 1 | v414i == 1 |v414j  == 1
-replace nt_frtveg = . if(v414f == . & v414i == .  & v414j  == .)
+gen  nt_frtveg = v470u == 1 
+replace nt_frtveg = . if(v470u == . )
 label var nt_frtveg "Child given other fruits or vegetables in day/night before survey- last-born under 2 years"
 
 
 // Given nuts or legumes
 
-gen nt_nuts = v414o == 1
-replace nt_nuts = . if v414o == .
+gen nt_nuts = v470w == 1
+replace nt_nuts = . if v470w == .
 label var nt_nuts "Child given legumes or nuts in day/night before survey- last-born under 2 years"
 
 
 // Given meat+ eggs
 
-gen nt_meat = v414h == 1 | v414m == 1 | v414g == 1  //NA
-replace nt_meat = . if  v414h == . & v414m == .  & v414g == 1
+gen nt_meat = v470v == 1 
+replace nt_meat = . if  v470v == . 
 label var nt_meat "Child given meat, fish, shellfish, or poultry in day/night before survey- last-born under 2 years"
 
-
+/*
 
 // Given eggs
-gen nt_eggs = v414g==1
+gen nt_eggs = v470v==1
 replace nt_eggs = . if  v414g == .
 label var nt_eggs "Child given eggs in day/night before survey- last-born under 2 years"
 
-
+*/
 // Given dairy
-egen dairy_prod = rowtotal(v411 v411a v414p)
+gen dairy_prod = v470h == 1
 
 
 gen nt_dairy = dairy_prod != 0 
@@ -785,12 +763,11 @@ label var nt_solids "Child given any solid or semisolid food in day/night before
 
 // Fed milk or milk products
 gen totmilkf = 0
-replace totmilkf=  1 if v411 ==1 
-replace totmilkf=  1 if v411a ==1 
-replace totmilkf = 1 if v414p == 1   
-replace totmilkf = . if(v411 == . & v411a == . & v414p == .)
+replace totmilkf=  1 if v470h ==1 
+*replace totmilkf=  1 if v411a ==1 
+*replace totmilkf = 1 if v414p == 1   
+replace totmilkf = . if(v470h == . )
 gen nt_fed_milk= ( totmilkf==1 | m4==95) if inrange(age_in_months,6,24)
-label values nt_fed_milk yesno
 label var nt_fed_milk "Child given milk or milk products- last-born 6-23 months"
 
 
@@ -813,7 +790,7 @@ label var nt_fed_milk "Child given milk or milk products- last-born 6-23 months"
 	gen group5= nt_frtveg==1
 
 	*6. eggs
-	gen group6= nt_eggs==1  
+	*gen group6= nt_eggs==1  
 
 	*7. legumes and nuts
 	gen group7= nt_nuts==1
@@ -822,10 +799,10 @@ label var nt_fed_milk "Child given milk or milk products- last-born 6-23 months"
 	gen group8= nt_meat==1
 
 // Min dietary diversity
-egen foodsum = rsum(group1 group2 group3 group4 group5  group6 group7 group8)  
-recode foodsum (1/3 =0 "No") (5/8=1 "Yes"), gen(nt_mdd)
+egen foodsum = rsum(group1 group2 group3 group4 group5   group7 group8)   //group6
+recode foodsum (1/3 =0 "No") (4/7=1 "Yes"), gen(nt_mdd)
 replace nt_mdd=. if inrange(age_in_months, 6, 24)
-label var nt_mdd "Child with minimum dietary diversity, 5 out of 8 food groups- last-born 6-23 months"
+label var nt_mdd "Child with minimum dietary diversity, 4 out of 7 food groups- last-born 6-23 months"
 
 gen non_mdd =1 if nt_mdd==0   
 replace non_mdd=0 if nt_mdd==1 
@@ -868,23 +845,23 @@ count
 sort hhid
 collapse (max) nt_milk nt_formula nt_grains_tuber nt_vit nt_frtveg nt_nuts nt_meat nt_dairy nt_solids nt_mdd new_No_min_diet_diversity_hh  min_meal_freq_bf_* b1 b2 nt_fed_milk    , by (hhid v001 v002 v007)
 
-save "$dta/NEW_1_food_2011.dta", replace
+save "$dta/NEW_1_food_2001.dta", replace
 
 *********************************************************************************************************************************
 * MERGING (Household Level)
 *********************************************************************************************************************************
 
-use "$hrdata2011.dta", clear
+use "$hrdata2001.dta", clear
 
-keep hhid hv001 hv002 hv003 hv005 hv007 hv021 hv022 hv023 hv024 hv025 hv006 hv008 hv009  hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 hv270  hv271     hv220  hv209 hv210 hv211 hv212  hv221    hv219 hv220  hv012 
+keep hhid hv001 hv002 hv003 hv005 hv007 hv021 hv022 hv023 hv024 hv025 hv006 hv008 hv009  hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215   sh051 sh052     hv220  hv209 hv210 hv211 hv212  hv221    hv219 hv220  hv012 
 
 *population weight
 gen popwt = (hv005/1e6) * hv012  
 
 rename hv025 type_place 
 rename hv024 region
-rename hv270 wealth_index
-rename hv271 wealth_index_score
+rename sh052 wealth_index
+rename sh051 wealth_index_score
 
 
 gen v001 = hv001
@@ -907,7 +884,7 @@ gen wat_avl_prms = hv204 == 996
 replace wat_avl_prms = . if hv204 == .
 
 * Year
-gen year=2011
+gen year=2001
 
 collapse hv003 hv005 hv007 hv021 hv022 hv023 hv006 hv008 hv009 type_place region hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 year wealth_index wealth_index_score  hv219 hv220 hv209 hv210 hv211 hv212  hv221  popwt   wat_avl_prms , by (hhid v001 v002 )
 
@@ -915,23 +892,22 @@ sort hhid v001 v002
 
 * Merging
 
-merge 1:1 hhid v001 v002 using "$dta/HHwomen_2011.dta"    
+merge 1:1 hhid v001 v002 using "$dta/HHwomen_2001.dta"    
 drop _merge
 
-*CHECK!!!
-merge 1:1 hhid v001 v002 using "$dta/HHmen_2011.dta", keep(1 3)
+merge 1:1 hhid v001 v002 using "$dta/HHmen_2001.dta"
 drop _merge
 
-merge 1:1 hhid v001 v002 using "$dta/HH_2011.dta"
+merge 1:1 hhid v001 v002 using "$dta/HH_2001.dta"
 drop _merge
 
-merge 1:1 hhid v001 v002 using "$dta/food_2011.dta"
+merge 1:1 hhid v001 v002 using "$dta/food_2001.dta"
 drop _merge
 
-merge 1:1 hhid v001 v002 using "$dta/NEW_1_food_2011.dta"
+merge 1:1 hhid v001 v002 using "$dta/NEW_1_food_2001.dta"
 drop _merge
 
-replace year=2011 if year==.
+replace year=2001 if year==.
 order hhid year
 drop v001 v002 v003
 
@@ -951,29 +927,26 @@ order hhid hv001 hv002 hv003
 
 *value_labels_aasignment
 
-replace year = hv007 if year != hv007
+*replace year = hv007 if year != hv007
 
 rename (hv001 year) (dhsclust dhsyear)
 /*
 preserve
 
 
-import delimited "$geodata2011.csv", case(lower) clear 
+import delimited "$geodata2006.csv", case(lower) clear 
 *Data cleaning of GPS Data (Missing values coded as -9999)
 foreach var of varlist all_population_count_2005-wet_days_2015 {
 	replace `var' = . if `var' == -9999
 }
 
-duplicates tag dhsclust dhsyear, gen(x)
-drop if x == 65
-drop x
 
-tempfile gps2011
-save 	`gps2011', replace
+tempfile gps2006
+save 	`gps2006', replace
 
 restore
 
-merge m:1  dhsyear dhsclust using `gps2011' 
+merge m:1  dhsyear dhsclust using `gps2006' 
 keep if _merge == 3   // 1 obs unmatched
 drop _merge
 
@@ -983,4 +956,4 @@ gsort dhsclust hv002
 */
 order hhid dhsclust hv002 hv003 dhsyear
 
-save "$output/final_2011.dta", replace
+save "$output/final_2001.dta", replace

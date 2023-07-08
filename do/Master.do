@@ -170,8 +170,7 @@ Date last modified:		July 7, 2023
 	append using "$output/final_2006.dta", force
 	append using "$output/final_2001.dta", force
 	
-	qui:compress //To reduce file size for Github 
-	
+	qui:compress 
 	
 	*Can attach the general temperature and precipitation dataset, but refraining for simplicity in the output file
 	

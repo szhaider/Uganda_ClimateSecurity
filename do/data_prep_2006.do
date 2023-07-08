@@ -929,7 +929,7 @@ drop _merge
 merge 1:1 hhid v001 v002 using "$dta/NEW_1_food_2006.dta"
 drop _merge
 
-replace year=2011 if year==.
+replace year=2006 if year==.
 order hhid year
 drop v001 v002 v003
 
