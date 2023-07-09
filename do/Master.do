@@ -198,7 +198,7 @@ Date last modified:		July 7, 2023
 
 	
 	*Merging DHS+GEO Final dataset with Climate Anomalies datasets (based on the month of interview of household in respective year)
-	*do 		./do/dhs_climate_merge.do
+	do 		./do/dhs_climate_merge.do
 	
 	
 	*Cleaning conflicts data from excel input (UPSALA)
