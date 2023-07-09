@@ -163,6 +163,7 @@ Date last modified:		July 7, 2023
 	
 *	2001 data preparation	
 	do 		./do/data_prep_2001.do	
+	*---------------------------------------------------------------------------
 	
 *	Combining clean DHS Datasets	
 	use "$output/final_2016.dta", clear
@@ -170,34 +171,31 @@ Date last modified:		July 7, 2023
 	append using "$output/final_2006.dta", force
 	append using "$output/final_2001.dta", force
 	
-	qui:compress 
-	
-	*Can attach the general temperature and precipitation dataset, but refraining for simplicity in the output file
-	
-    *use "$output/final_phillipines", clear
-	*merge m:1 dhsyear dhsclust using "$rawdata/Philippines/PH_precipitation_final_allyears.dta", nogen   //All precipitation data matched
-	*merge m:1 dhsyear dhsclust using "$rawdata/Philippines/PH_temperature_final_allyears.dta", nogen   //All temperature data matched
-	
-
 	*Final DHS (2016+2011+2006+2001) Dataset	
 	qui:compress
 	gsort dhsyear dhsclust hhid
+	drop if dhsyear == .
 	rename hv006 month   //Month of interview and month of child birth (to merge with anomalies dataset)
 	save "$output/final_Uganda.dta", replace
 	
-	*	Cluster level Gini Calculation and addition in the Final Dataset - Based on 0-transformed wealth index 
-	*do      ./do/gini_cluster.do	
-	
-
+	*---------------------------------------------------------------------------
 	*Merging Temperature and Precipitation Anomalies datasets (Extracted from .nc files and prepared in R - Using the prepared datasets here)
 	*Combined Temperature and precipitation dataset 
-	use "$rawdata/Uganda/Uganda_prec_final_anamoly.dta", clear
-	merge 1:1 dhsyear dhsclust time adm1name latnum longnum  using "$rawdata/Uganda/Uganda_temp_final_anamoly.dta", nogen //All matched
+	use "$output/Uganda_prec_final_anamoly.dta", clear
+	merge 1:1 dhsyear dhsclust time adm1name latnum longnum  using "$output/Uganda_temp_final_anamoly.dta", nogen //All matched
 	drop count
 	compress
-	*drop if prec == . | temp == .  //18,816 obs dropped in long
-	save "$rawdata/Uganda/Final_Climate_anomalies_allyears.dta", replace
+	save "$output/Final_Climate_anomalies_allyears.dta", replace
+	*---------------------------------------------------------------------------
+
 	
+	*Can attach the general temperature and precipitation dataset, but refraining for simplicity in the output file
+	
+    *use "$output/final_Uganda.dta", clear
+	*merge m:1 dhsyear dhsclust using "$output/UG_precipitation_final_allyears.dta", nogen  //All  precipitation data matched
+	*merge m:1 dhsyear dhsclust using "$output/UG_temperature_final_allyears.dta", nogen    //All temperature data matched
+	*---------------------------------------------------------------------------
+
 	
 	*Merging DHS+GEO Final dataset with Climate Anomalies datasets (based on the month of interview of household in respective year)
 	*do 		./do/dhs_climate_merge.do
@@ -217,20 +215,7 @@ Date last modified:		July 7, 2023
 	
 	*Final Dataset (DHS + Clmate anomalies + Conflicts + Prices) [Grid level collapse for panel dataset]
 	*do 		./do/Final_Dataset.do
-	
-	/*
-	*Restrict age brackets of Household head :  for various analyses - Bring in Phillipines context
-	local x = 25
-	local y = 55
-	local head_age 0    //Change to 1 to restrict household heads' age in regressions and analysis
-	if `head_age' {
-	 keep if inrange(hv220, `x', `y') 
-	}
-	
-	*	Household level asset index (Land-NA + Livestock-NA + productive capital) (Wealth index is too broad)	
-			*/
-			
-*	
+		
 *}
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------

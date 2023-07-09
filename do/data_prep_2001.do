@@ -884,7 +884,7 @@ gen wat_avl_prms = hv204 == 996
 replace wat_avl_prms = . if hv204 == .
 
 * Year
-gen year=2001
+gen year=2000
 
 collapse hv003 hv005 hv007 hv021 hv022 hv023 hv006 hv008 hv009 type_place region hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 year wealth_index wealth_index_score  hv219 hv220 hv209 hv210 hv211 hv212  hv221  popwt   wat_avl_prms , by (hhid v001 v002 )
 
@@ -907,7 +907,7 @@ drop _merge
 merge 1:1 hhid v001 v002 using "$dta/NEW_1_food_2001.dta"
 drop _merge
 
-replace year=2001 if year==.
+replace year=2000 if year==.
 order hhid year
 drop v001 v002 v003
 
