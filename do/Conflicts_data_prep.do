@@ -66,7 +66,6 @@ graph export "$figures/conflicts.png", replace
 
 restore
 
-/*
 *Reshaping wide
 
 encode event_type, gen(event)

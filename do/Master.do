@@ -201,9 +201,17 @@ Date last modified:		July 7, 2023
 	do 		./do/dhs_climate_merge.do
 	
 	
-	*Cleaning conflicts data from excel input (UPSALA)
-	*do      ./do/Conflict_UCDP.do
+	*Cleaning conflicts data from excel input (ACLED)
+	do      ./do/Conflicts_data_prep.do
 	
+	
+	*DHS Cluster - Quarter - Year Mapping for buffers
+	/*
+	use "$results/Final_Uganda_DHS_GEO_CLimate", clear
+	keep dhsclust dhsyear quarter longnum latnum
+	duplicates drop dhsyear dhsclust, force
+	save "$output/dhscluster_quarter_mapping.dta", replace
+	*/
 	
 	*This do file prepares Conflict events .csv files for further GIS analysis in QGIS
 	*do      ./do/Acled_quarters_qgis.do
