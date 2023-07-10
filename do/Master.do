@@ -48,6 +48,7 @@ Date last modified:		July 7, 2023
 	global output "$root/output"
 	global results "$root/results"
 	global figures "$root/figures"
+	global qgis "$root/Grid_QGIS"
 
 *-----------------
 	dir "${root}"
@@ -218,6 +219,8 @@ Date last modified:		July 7, 2023
 	*import delimited "$xlsx/buffers/FinalData_conflicts_ALLYEARS.csv", clear
 	*rename dhsquarter quarter
 	*save "$results/final_conflicts_DHS_Uganda.dta", replace
+	
+	
 	*---------------------------------------------------------------------------
 	
 	*Final Dataset (DHS + Clmate anomalies + Conflicts) [Grid level collapse for panel dataset]
