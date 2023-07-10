@@ -224,37 +224,12 @@ Date last modified:		July 7, 2023
 	*---------------------------------------------------------------------------
 	
 	*Final Dataset (DHS + Clmate anomalies + Conflicts) [Grid level collapse for panel dataset]
-	*do 		./do/Final_Dataset.do
+	do 		./do/Final_Dataset.do
 		
 *}
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
-/*
-	program drop labels_dhs_indicators
-	program drop value_labels_aasignment
-	program drop check_age_variable
-	
-	cap erase "$temp/*.dta"
-	
-	//Dropping for less file size
-	cap erase "$output/final_2003.dta"
-	cap erase "$output/final_2008.dta"
-	cap erase "$output/final_2017.dta"
-	cap erase "$dta/food_2003.dta"
-	cap erase "$dta/food_2008.dta"
-	cap erase "$dta/food_2017.dta"
-    cap rm "$dta/HH_counts_2003.dta"
-	cap rm "$dta/HH_counts_2008.dta"
-    cap rm "$dta/HH_counts_2017.dta"
-	cap rm "$dta/HHmen_2003.dta"
-	cap rm "$dta/HHmen_2008.dta"
-	cap rm "$dta/HHmen_2017.dta"
-	cap rm "$dta/HHwomen_2003.dta"
-	cap rm "$dta/HHwomen_2008.dta"
-	cap rm "$dta/HHwomen_2017.dta"
-	cap rm "$dta/NEW_1_food_2003.dta"
-	cap rm "$dta/NEW_1_food_2008.dta"
-	cap rm "$dta/NEW_1_food_2017.dta"
+
 
 	log close
 *-------------------------------------------------------------------------------

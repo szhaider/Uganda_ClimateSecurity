@@ -259,8 +259,6 @@ label var dummy_protests_f "Future protests - dummy"
 *-------------------------------------------------------------------------------
 compress
 
-*Assiging var labels
-*labels_dhs_indicators
 *-------------------------------------------------------------------------------
 
 *Final Dataset- Household level
