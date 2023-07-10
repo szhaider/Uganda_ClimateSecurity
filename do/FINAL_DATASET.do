@@ -7,36 +7,82 @@ use "results/Final_Uganda_DHS_GEO_CLimate.dta", clear
 
 order dhsclust longnum latnum dhsyear quarter 
 *-------------------------------------------------------------------------------
-*gen urban_rural = type_place == 1
-gen HH_head_female = hv219  == 2
 
-gen rural_prop = type_place == 2   //1 if rural
+gen HH_head_female = hv219  == 2    // Proportion of female headed households
+
+gen rural_prop = type_place == 2   // Proportion of rural households
 
 
-gen HH_with_rud_floor_material = inrange(hv213, 11, 22) 
+gen HH_with_rud_floor_material = inrange(hv213, 10, 22)    //Proportion of households with rudimentary floor material									
+/*
+definition
+          10   natural
+          11   earth/sand
+          12   dung
+          20   rudimentary
+          21   wood planks
+          22   palm/bamboo   
+          30   finished
+          31   parquet or polished wood
+          32   concrete
+          33   ceramic tiles
+          34   cement screed
+          35   carpet
+          36   stones
+          37   bricks
+          96   other
+		  */
 
+gen HH_with_improved_tiolet = inrange(hv205, 10, 13)  						// type of toilet facility 		  
+		  
+		  /*
+		   definition
+          10   flush toilet
+          11   flush to piped sewer system
+          12   flush to septic tank
+          13   flush to pit latrine
+          14   flush to somewhere else
+          15   flush, don't know where
+          20   pit toilet latrine
+          21   ventilated improved pit latrine (vip)
+          22   pit latrine with slab
+          23   pit latrine without slab/open pit
+          30   no facility
+          31   no facility/bush/field
+          41   composting toilet/ecosan
+          42   bucket toilet
+          43   hanging toilet/latrine
+          96   other
+
+   variables:  hv205
+
+		  */
+		  
 /*
 Region Label (F.Es)
-Definition
-           1   national capital region
-           2   cordillera admin region
-           3   i - ilocos
-           4   ii - cagayan valley
-           5   iii - central luzon
-           6   iva - calabarzon
-           7   ivb - mimaropa
-           8   v - bicol
-           9   vi - western visayas
-          10   vii - central visayas
-          11   viii - eastern visayas
-          12   ix - zamboanga peninsula
-          13   x - northern mindanao
-          14   xi - davao
-          15   xii - soccsksargen
-          16   xiii - caraga
-          17   armm
+ definition  2016   , only 10 in 2011, 9 in 2006, 4 in 2001  !!!(Districts are available for 2016 (112), 2006 (56) & 2001 (34), but missing in 2011)!!!
+           0   kampala
+           1   south buganda
+           2   north buganda
+           3   busoga
+           4   bukedi
+           5   bugisu
+           6   teso
+           7   karamoja
+           8   lango
+           9   acholi
+          10   west nile
+          11   bunyoro
+          12   tooro
+          13   ankole
+          14   kigezi
 
-   Variables:  region
+
+   Variables: hv024 == region
+
+*/
+
+/* Districts sh002 shdist, County sh003
 
 */
 
@@ -44,34 +90,31 @@ rename  type_place rural_urban
 *-------------------------------------------------------------------------------
 
 collapse (mean) prec prec_rollMean_* temp temp_rollMean_* ///
-access_electricity=hv206 own_radio=hv207 own_tv=hv208 own_refrigerator=hv209 own_bicycle=hv210 own_scooter=hv211 own_car=hv212 own_telephone= hv221 ///
-HH_head_female	HH_head_age= hv220 hhsize = hv009 ///									//1 female 0 male	
-head_* ///  //Household Head characteristics
-hh_head_* ///
-relg_* ///   //Religion of Head 
-child_size_small_at_birth ///
-No_min_diet_diversity_hh No_min_meal_freq_hh  only_breast_feeding_hh ///
-new_No_min_diet_diversity_hh new_No_min_meal_freq_hh new_No_min_acc_diet_hh min_meal_freq_bf_inf min_meal_freq_bf_child ///	
-HH_with_rud_floor_material rural_prop  ///
-gini ///
-infant_mortality ///
-(sum) tot_*  ///													
+access_electricity=hv206 own_radio=hv207 own_tv=hv208 own_refrigerator=hv209 own_bicycle=hv210 own_scooter=hv211 own_car=hv212 own_telephone= hv221  ///
+HH_head_female	HH_head_age= hv220 hhsize = hv009 ///						
+head_* ///  //Household Head characteristics (Ocuupation (women + men), Education (women + men), )
+hh_head_* /// Household head education (no, prim, sec, higher)
+RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* /// women BMI, Rohrer's index (low/very low), Severe/Moderate Anemia-women, 
+stunted_ch wasted_ch underwht_ch 	nt_ch_sev_anem		///   Stunt, Wast, Underw, Moderate/severe Anemia
+HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
+No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast min_diet_diversity   /// children diet and food nutrition No_min_meal_freq_hh Meal_freq_hh
+new_No_min_diet_diversity_hh nt_mdd min_meal_freq_bf_inf min_meal_freq_bf_child /// children diet and food nutrition
+(sum) tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
+No_of_lowrohrer_w=tot_RI_Low_w No_of_lowBMI_w=DHS_tot_BMI_low_w No_of_anem_w=sev_mod_anemia_hh /// number of stunted, wasted, underweight , low rohrer women, 	low BMI women										
 (median) median_wealth_index_quintile=wealth_index median_wealth_index_score=wealth_index_score  ///
-[pw=wgt], by (dhsyear quarter  dhsclust latnum longnum region )    //rural_urban
-
-*rural_urban=type_place 	///													//1 Urban, 2 Rural
+[pw=wgt], by (dhsyear quarter region dhsclust latnum longnum )  // no. of regions goes down back in early years 
 
 sort dhsyear dhsclust
 *-------------------------------------------------------------------------------
-*Final COnflicts Data - all years
-merge 1:1 dhsclust dhsyear quarter using "$output/final_conflicts.dta"  // All matched 
-keep if _m == 3
-drop _m
+*Final Conflicts Data - all years
+merge 1:1 dhsyear dhsclust quarter using "$results/final_conflicts_DHS_Uganda.dta", nogen  // All matched
 
+/*
 *Final Prices Data - All years
 merge m:1 dhsclust  dhsyear quarter     using "$output/prices.dta"   // Allmatched   
 keep if _m == 3
 drop _m
+*/
 *-------------------------------------------------------------------------------
 *Merging Grid level Data
 

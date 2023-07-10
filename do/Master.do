@@ -204,24 +204,23 @@ Date last modified:		July 7, 2023
 	*Cleaning conflicts data from excel input (ACLED)
 	do      ./do/Conflicts_data_prep.do
 	
-	
-	*DHS Cluster - Quarter - Year Mapping for buffers
+	*---------------------------------------------------------------------------
+	*Preparing DHS Cluster - Quarter - Year Mapping for buffers calculation in R & Grid creation in QGIS
 	/*
 	use "$results/Final_Uganda_DHS_GEO_CLimate", clear
 	keep dhsclust dhsyear quarter longnum latnum
-	duplicates drop dhsyear dhsclust, force
-	save "$output/dhscluster_quarter_mapping.dta", replace
+	duplicates drop dhsyear dhsclust quarter, force
+	save "$output/dhscluster_quarter_mapping.dta", replace     // For buffering in R
+	export delimited "$xlsx/grid/dhscluster_quarter_mapping.csv", replace  //for grid in QGIS
 	*/
 	
-	*This do file prepares Conflict events .csv files for further GIS analysis in QGIS
-	*do      ./do/Acled_quarters_qgis.do
+	*These steps rename variables in csv file and save in .dta -  Final Conflicts data file after buffering and overlaying over DHS GPS in R
+	*import delimited "$xlsx/buffers/FinalData_conflicts_ALLYEARS.csv", clear
+	*rename dhsquarter quarter
+	*save "$results/final_conflicts_DHS_Uganda.dta", replace
+	*---------------------------------------------------------------------------
 	
-	
-	**Cleaning and preparing WFP Food Prices data for overlay on Household clusters in QGIS
-	*do 		./do/wfp_food_prices.do
-	
-	
-	*Final Dataset (DHS + Clmate anomalies + Conflicts + Prices) [Grid level collapse for panel dataset]
+	*Final Dataset (DHS + Clmate anomalies + Conflicts) [Grid level collapse for panel dataset]
 	*do 		./do/Final_Dataset.do
 		
 *}

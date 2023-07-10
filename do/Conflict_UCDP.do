@@ -66,6 +66,7 @@ graph export "$figures/conflicts.png", replace
 
 restore
 
+
 /*
 *Reshaping wide
 

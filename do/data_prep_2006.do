@@ -246,7 +246,7 @@ tab nt_wm_micro_iron, gen(nt_wm_micro_iron)
 
 * Collapsing at HH level
 sum  v001 v002
-collapse tot_wmen* head* RI_Low_w tot_RI_Low_w nt_wm_modsevthin DHS_tot_BMI_low_w sev_mod_anemia_hh  nt_wm_micro_iron*, by (hhid v001 v002)
+collapse tot_wmen* head* RI_Low_w tot_RI_Low_w nt_wm_modsevthin DHS_tot_BMI_low_w sev_mod_anemia_hh nt_wm_sev_anem nt_wm_micro_iron*, by (hhid v001 v002)
 
 sum
 order hhid v001 v002

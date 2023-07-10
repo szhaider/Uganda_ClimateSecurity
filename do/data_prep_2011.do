@@ -246,7 +246,7 @@ tab nt_wm_micro_iron, gen(nt_wm_micro_iron)
 
 * Collapsing at HH level
 sum  v001 v002
-collapse tot_wmen* head* RI_Low_w tot_RI_Low_w nt_wm_modsevthin DHS_tot_BMI_low_w sev_mod_anemia_hh  nt_wm_micro_iron*, by (hhid v001 v002)
+collapse tot_wmen* head* RI_Low_w tot_RI_Low_w nt_wm_modsevthin DHS_tot_BMI_low_w sev_mod_anemia_hh nt_wm_sev_anem nt_wm_micro_iron*, by (hhid v001 v002)
 
 sum
 order hhid v001 v002
@@ -686,7 +686,7 @@ replace Meal_freq_hh=0 if Meal_freq_hh==.
 
 count
 sort hhid
-collapse (max) hh_young_ch  min_diet_diversity No_min_diet_diversity_hh No_min_meal_freq inf_min_breast not_inf_min_breast, by (hhid v001 v002 v007)
+collapse (max) hh_young_ch  min_diet_diversity No_min_diet_diversity_hh No_min_meal_freq No_min_meal_freq_hh inf_min_breast not_inf_min_breast, by (hhid v001 v002 v007)
    
 save "$dta/food_2011.dta", replace
 
