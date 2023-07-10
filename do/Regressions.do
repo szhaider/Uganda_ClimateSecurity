@@ -274,16 +274,22 @@ gen ihs_tot_pres= log(tot_conf_present + sqrt(tot_conf_present^2 + 1))
 ******************************************************************
 // OTHER VARIABLES (May be later suh as prices)
 ******************************************************************
+*Notes:
+* 1. Rainfall results are relatively better 
+* 1.1 12 month positive rainfall anolmalies worl best (significant direct and total, insignificnat indirect)
+* 2. Positive rainfall anomalies work better than -ve rainfall anomalies
+* 3. Battles, Riots, VAC ==> Same results
 
+* 4. Positive temp significant for 3-month and protests (direct + total)
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 
-*Models 
+*Model 1 (Rainfall)
 
-*Mediation	- by Maize Prices and Rainfall anamoly   (12, 9: Okay with insignificnat indirect effect, 3,6 not working here)
-global control1  rural_prop   dummy_wmhead_unempl    log_battles_pres          
-global control2  rural_prop   dummy_wmhead_unempl    log_battles_pres
+*Mediation	- by Stunting and Rainfall anamoly   (12, 9: Okay with insignificnat indirect effect, 3,6 not working here)
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_battles_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_battles_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
 global prec_anamoly "anom_rain12_POS" 	
 global conflict "log_battles_fut"   
 
@@ -301,374 +307,147 @@ nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
 * Total 
 nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
 
-/*
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
 
-
-*Models as on 05/22/2023
-*Mediation	- by Maize Prices and mix Rainfall anamoly   
-global control1 rural_prop  dummy_wmhead_empl   log_osv          
-global control2  rural_prop   dummy_wmhead_empl    log_osv
+*-------------------------------------------------------------------------------
+*Mediation	- by Stunting and Rainfall anamoly   (Only 12 works)
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_riots_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_riots_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
 global prec_anamoly "anom_rain12_POS" 	
-global conflict "log_osv_fut"   //Focus only on OSV
+global conflict "log_riots_fut"   
 
-gsem (maize <- $prec_anamoly  anom_rain12_NEG $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- maize $prec_anamoly anom_rain12_NEG $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+gsem (stunted_ch <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- stunted_ch $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
 
-	outreg2 using "$results/tables/table_posneg_rain_maize12.xls", replace keep(maize $prec_anamoly anom_rain12_NEG $control1 $control2) dec(3) nocons 
+	outreg2 using "$results/tables/table_pos_rain_riotsstunt12.xls", replace keep(stunted_ch $prec_anamoly $control1 $control2) dec(3) nocons 
 
 * Direct
 nlcom  _b[$conflict:$prec_anamoly]
 
 * Indirect
-nlcom _b[maize:$prec_anamoly] * _b[$conflict:maize]
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
 
 * Total 
-nlcom _b[maize:$prec_anamoly] * _b[$conflict:maize] + _b[$conflict:$prec_anamoly]
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
+*-------------------------------------------------------------------------------
+*Mediation	- by Stunting and Rainfall anamoly   (Only 12, 9 works)
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
+global prec_anamoly "anom_rain12_POS" 	
+global conflict "log_vac_fut"   
 
+gsem (stunted_ch <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- stunted_ch $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
 
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
+	outreg2 using "$results/tables/table_pos_rain_vac_stunt12.xls", replace keep(stunted_ch $prec_anamoly $control1 $control2) dec(3) nocons 
 
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
 
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
+* Indirect
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
 
-*Models as on 05/22/2023 <<<<<<<<<<<<<<<<
-*Mediation	- by Maize Prices and  Rainfall Dummies   
-global control1 rural_prop  dummy_wmhead_empl   log_osv          
-global control2  rural_prop   dummy_wmhead_empl    log_osv
+* Total 
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
+*-------------------------------------------------------------------------------
+*-------------------------------------------------------------------------------
+*Mediation	- by Stunting and Rainfall anamoly   (Only 12, 9 works)
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_protests_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_protests_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
+global prec_anamoly "anom_rain12_POS" 	
+global conflict "log_protests_fut"   
+
+gsem (stunted_ch <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- stunted_ch $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/table_pos_rain_prot_stunt12.xls", replace keep(stunted_ch $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
+
+* Total 
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
+*-------------------------------------------------------------------------------
+*Models 2 (Rainfall Dummy)  (work for battles + protests + VAC) (not for riots)
+
+*Mediation	- by stunting and  Rainfall Dummies   
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
 global prec_anamoly "dummy_rain12_neg" 	
-global conflict "log_osv_fut"   //Focus only on OSV
+global conflict "log_vac_fut"  
 
-gsem (maize <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- maize $prec_anamoly  $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+gsem (stunted_ch <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- stunted_ch $prec_anamoly  $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
 
-	outreg2 using "$results/tables/table_dummy_rain_maize12.xls", replace keep(maize $prec_anamoly  $control1 $control2) dec(3) nocons 
+	outreg2 using "$results/tables/table_dummy_rain_stunt12.xls", replace keep(stunted_ch $prec_anamoly  $control1 $control2) dec(3) nocons 
 
 * Direct
 nlcom  _b[$conflict:$prec_anamoly]
 
 * Indirect
-nlcom _b[maize:$prec_anamoly] * _b[$conflict:maize]
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
 
 * Total 
-nlcom _b[maize:$prec_anamoly] * _b[$conflict:maize] + _b[$conflict:$prec_anamoly]
+nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
 
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
+*Models 3 (Positive Temperature anomalies)  pos temp not significant in general  (Significant for 3 month protests)
 
+*Mediation	- by Stunitng and  temp anamoly
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_protests_pres      underwht_ch No_min_diet_diversity_hh //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_protests_pres      underwht_ch No_min_diet_diversity_hh //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
+
+global temp_anamoly "anom_tmax3_POS" 	
+global conflict "log_protests_fut"   
+
+gsem (stunted_ch <- $temp_anamoly $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- stunted_ch $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+	
+	outreg2 using "$results/tables/table_temp3_vac.xls", replace keep(stunted_ch $temp_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$temp_anamoly]
+
+* Indirect
+nlcom _b[stunted_ch:$temp_anamoly] * _b[$conflict:stunted_ch]
+
+* Total 
+nlcom _b[stunted_ch:$temp_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$temp_anamoly]
+
+*-------------------------------------------------------------------------------
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 
-*Models as on 05/22/2023 <<<<<<<<<<<<<<<<
-*Mediation	- by Maize Prices and  Temperature Dummies   
-global control1 rural_prop  dummy_wmhead_empl   log_osv          
-global control2  rural_prop   dummy_wmhead_empl    log_osv
+*Models 4
+
+*Mediation	- by Stunting and  Temperature Dummies   
+global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_battles_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_battles_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
 global temp_anamoly "dummy_tmax12_pos" 	
-global conflict "log_osv_fut"   //Focus only on OSV
+global conflict "log_battles_fut"  
 
-gsem (maize <- $temp_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- maize $temp_anamoly  $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+gsem (stunted_ch <- $temp_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- stunted_ch $temp_anamoly  $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
 
-	outreg2 using "$results/tables/table_dummy_temp_maize12.xls", replace keep(maize $temp_anamoly  $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$temp_anamoly]
-
-* Indirect
-nlcom _b[maize:$temp_anamoly] * _b[$conflict:maize]
-
-* Total 
-nlcom _b[maize:$temp_anamoly] * _b[$conflict:maize] + _b[$conflict:$temp_anamoly]
-
-
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*Food Prices as mediator  (tot conflice insignificant) (do it with state based vilence too)
-global control1 rural_prop  dummy_wmhead_empl   log_osv       
-global control2  rural_prop   dummy_wmhead_empl    log_osv
-
-global temp_anamoly "anom_tmax3_POS" 	
-global conflict "log_osv_fut"   
-
-
-*Mediation	- by Maize Prices and temp anamoly
-gsem (maize <- $temp_anamoly $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- maize $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-	
-	outreg2 using "$results/tables/table_temp_maize3_osv.xls", replace keep(maize $temp_anamoly $control1 $control2) dec(3) nocons 
+	outreg2 using "$results/tables/table_dummy_temp_stunt12.xls", replace keep(stunted_ch $temp_anamoly  $control1 $control2) dec(3) nocons 
 
 * Direct
 nlcom  _b[$conflict:$temp_anamoly]
 
 * Indirect
-nlcom _b[maize:$temp_anamoly] * _b[$conflict:maize]
+nlcom _b[stunted_ch:$temp_anamoly] * _b[$conflict:stunted_ch]
 
 * Total 
-nlcom _b[maize:$temp_anamoly] * _b[$conflict:maize] + _b[$conflict:$temp_anamoly]
-
-*******************************************************************************
-**************
-*Mediation	- by Maize Prices and Rainfall anamoly   
-global control1 rural_prop  dummy_wmhead_empl   log_osv       //    
-global control2  rural_prop   dummy_wmhead_empl    log_osv
-global prec_anamoly "anom_rain3_NEG" 	
-global conflict "log_osv_fut"   //log_osv_fut   log_sbv_fut   
-
-gsem (maize <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- maize $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_rain_maize3.xls", replace keep(maize $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[maize:$prec_anamoly] * _b[$conflict:maize]
-
-* Total 
-nlcom _b[maize:$prec_anamoly] * _b[$conflict:maize] + _b[$conflict:$prec_anamoly]
-********************************************************************************
-*Mediation	- by Rice Prices and  temp anamoly
-global control1 rural_prop  dummy_wmhead_empl   log_osv          
-global control2  rural_prop   dummy_wmhead_empl    log_osv
-
-global temp_anamoly "anom_tmax12_POS" 	
-global conflict "log_osv_fut"   
-
-gsem (rice <- $temp_anamoly $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- rice $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-	
-	outreg2 using "$results/tables/table_rice12_osv.xls", replace keep(maize $temp_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$temp_anamoly]
-
-* Indirect
-nlcom _b[rice:$temp_anamoly] * _b[$conflict:rice]
-
-* Total 
-nlcom _b[rice:$temp_anamoly] * _b[$conflict:rice] + _b[$conflict:$temp_anamoly]
-
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-// You need to run different tests, particularly looking at:
-* how climate variables interact with food and nutrition insecurity;
-* how food and nutrition insecurity variables interact with conflicts;
-* how climate interacts with conflicts.
-
-global control1 rural_prop gini dummy_wmhead_empl  log_sbv_pres   log_rice_retail_kg       //rurual_dummy is a proportion       log_osv
-global control2  rural_prop  gini dummy_wmhead_empl  log_sbv_pres log_rice_retail_kg   //HH_with_rud_floor_material     log_osv
-
-*Diff options for temp anamolies (dummy_tmax3_pos dummy_tmax6_pos dummy_tmax9_pos dummy_tmax12_pos anom_tmax3_POS anom_tmax6_POS anom_tmax9_POS anom_tmax12_POS temp_Q1_12 temp_Q2_12 temp_Q3_12 temp_Q4_12 temp_Q3_6 temp_Q4_6)
-*Convergence issues : temp_Q3_12
-*Temp dummy gives same almost results
-
-*Diff options for conflicts: (log_tot_fut log_tot_pres log_tot_w_fut log_tot_w_pres    ,  dummy_sbv dummy_sbvfut dummy_osv dummy_osvfut)
-
-* HH_head_female   
-*Try total conflicts
-*Use a continuous as DV  (new_child_size_small_at_birth_30)
-*replace median_wealth_index_score = median_wealth_index_score/100000
-*-------------------------------------------------------------------------------
-*child_size_small_at_birth as mediator
-gsem (child_size_small_at_birth <- anom_tmax12_POS  $control1  i.quarter#i.dhsyear i.region  M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_tmax12_POS  $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_1.xls", replace keep(child_size_small_at_birth anom_tmax12_POS $control1 $control2) dec(3) nocons 
-
-gsem (child_size_small_at_birth <- anom_tmax9_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_tmax9_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_2.xls", replace keep(child_size_small_at_birth anom_tmax9_POS $control1 $control2) dec(3) nocons 
-
-gsem (child_size_small_at_birth <- anom_tmax6_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_tmax6_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_3.xls", replace keep(child_size_small_at_birth anom_tmax6_POS $control1 $control2) dec(3) nocons 
-
-gsem (child_size_small_at_birth <- anom_tmax3_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_tmax3_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_4.xls", replace keep(child_size_small_at_birth anom_tmax3_POS $control1 $control2) dec(3) nocons 
-*-------------------------------------------------------------------------------
-
-global temp_anamoly "anom_tmax3_POS" 	
-global conflict "log_sbv_fut"   //log_osv_fut
-
-*Mediation	
-gsem (child_size_small_at_birth <- $temp_anamoly $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- child_size_small_at_birth $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-	
-	outreg2 using "$results/tables/table_4.xls", replace keep(child_size_small_at_birth $temp_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$temp_anamoly]
-
-* Indirect
-nlcom _b[child_size_small_at_birth:$temp_anamoly] * _b[$conflict:child_size_small_at_birth]
-
-* Total 
-nlcom _b[child_size_small_at_birth:$temp_anamoly] * _b[$conflict:child_size_small_at_birth] + _b[$conflict:$temp_anamoly]
-
-*Direct + total significant
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-
-*Gini Coeff as mediator 
-
-global control1 rural_prop  dummy_wmhead_empl  log_sbv_pres   rice       
-global control2  rural_prop   dummy_wmhead_empl  log_sbv_pres rice  
-
-
-global temp_anamoly "anom_tmax3_POS" 	
-global conflict "log_sbv_fut"   //log_osv_fut
-
-*Mediation	
-gsem (gini <- $temp_anamoly $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- gini $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-	
-	outreg2 using "$results/tables/table_gini3.xls", replace keep(gini $temp_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$temp_anamoly]
-
-* Indirect
-nlcom _b[gini:$temp_anamoly] * _b[$conflict:gini]
-
-* Total 
-nlcom _b[gini:$temp_anamoly] * _b[$conflict:gini] + _b[$conflict:$temp_anamoly]
-	
-********************************************************************************
-********************************************************************************
-********************************************************************************
-
-*Child Mortality as mediator
-
-global control1 rural_prop  dummy_wmhead_empl  gini log_osv   rice    //    
-global control2  rural_prop   dummy_wmhead_empl gini   log_osv rice
-
-global temp_anamoly "anom_tmax12_POS" 	
-global conflict "log_osv_fut"   
-
-*Mediation	
-gsem (infant_mortality <- $temp_anamoly $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- infant_mortality $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-	
-	outreg2 using "$results/tables/table_if12_osv.xls", replace keep(infant_mortality $temp_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$temp_anamoly]
-
-* Indirect
-nlcom _b[infant_mortality:$temp_anamoly] * _b[$conflict:infant_mortality]
-
-* Total 
-nlcom _b[infant_mortality:$temp_anamoly] * _b[$conflict:infant_mortality] + _b[$conflict:$temp_anamoly]
+nlcom _b[stunted_ch:$temp_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$temp_anamoly]
 
 
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
-
-
-/*
-*Experiment  (OSV is significant and vliadating)
-
-global control1  rural_prop dummy_wmhead_empl  gini log_osv log_rice_retail_kg         //rurual_dummy is a proportion    gini_20
-global control2   rural_prop dummy_wmhead_empl  log_osv log_rice_retail_kg    //HH_with_rud_floor_material  gini_2
-gsem (child_size_small_at_birth <- anom_tmax9_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_osv_fut <- child_size_small_at_birth anom_tmax9_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_exp_osv.xls", replace keep(child_size_small_at_birth anom_tmax9_POS $control1 $control2) dec(3) nocons 
-
-* Direct
-	nlcom  _b[log_osv_fut:anom_tmax6_POS]
-
-* Indirect
-	nlcom _b[child_size_small_at_birth:anom_tmax6_POS] * _b[log_osv_fut:child_size_small_at_birth]
-
-* Total 
-	nlcom _b[child_size_small_at_birth:anom_tmax6_POS] * _b[log_osv_fut:child_size_small_at_birth] + _b[log_osv_fut:anom_tmax6_POS]
-
-	
-global control1 rural_prop dummy_wm_employed gini log_sbv_pres log_rice_retail_kg         //rurual_dummy is a proportion    gini_20
-global control2  rural_prop  gini dummy_wm_employed log_sbv_pres log_rice_retail_kg   //HH_with_rud_floor_material  gini_2
-gsem (child_size_small_at_birth <- dummy_tmax12_pos $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth dummy_tmax12_pos $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_exp_temp_dummy.xls", replace keep(child_size_small_at_birth dummy_tmax12_pos $control1 $control2) dec(3) nocons 
-	
 *-------------------------------------------------------------------------------
-*precipitation
-
-*Convergence issues on negative
-
-gsem (child_size_small_at_birth <- anom_rain12_NEG $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_rain12_NEG $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_precNEG1.xls", replace keep(child_size_small_at_birth anom_rain12_NEG $control1 $control2) dec(3) nocons 
-*Convergence issues on positive
-gsem (child_size_small_at_birth <- anom_rain9_NEG $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_rain9_NEG $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_precNEG2.xls", replace keep(child_size_small_at_birth anom_rain9_NEG $control1 $control2) dec(3) nocons 
-
-gsem (child_size_small_at_birth <- anom_rain6_NEG $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_rain6_NEG $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_precNEG3.xls", replace keep(child_size_small_at_birth anom_rain6_NEG $control1 $control2) dec(3) nocons 
-
-gsem (child_size_small_at_birth <- anom_rain3_NEG $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_rain3_NEG $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_precNEG4.xls", replace keep(child_size_small_at_birth anom_rain3_NEG $control1 $control2) dec(3) nocons 
-
-	
-	
-gsem (child_size_small_at_birth <- anom_rain6_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_sbv_fut <- child_size_small_at_birth anom_rain6_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_precNEG4.xls", replace keep(child_size_small_at_birth anom_rain6_POS $control1 $control2) dec(3) nocons 
-	
-
-global control1 rural_prop dummy_wmhead_empl gini log_osv log_rice_retail_kg         //rurual_dummy is a proportion    gini_20
-global control2  rural_prop  gini dummy_wmhead_empl log_osv log_rice_retail_kg   //HH_with_rud_floor_material  gini_20
-
-	
-gsem (child_size_small_at_birth <- anom_tmax6_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_osv_fut <- child_size_small_at_birth anom_tmax6_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_precNEG4.xls", replace keep(child_size_small_at_birth anom_tmax6_POS $control1 $control2) dec(3) nocons 	
-/*	
-/*
-Agrr sector provides jobs for 1 in 4 filipinos -WB 
-
-Farmers + fisherfolks
-https://www.worldbank.org/en/results/2021/03/31/reducing-poverty-in-rural-areas
-
-*Destructive weather events are also a major concern, disproportionately affecting the poor and the most vulnerable, many of whom reside in rural areas. 
-
-
-*working
-
-global control1 rural_prop dummy_wmhead_empl gini log_osv log_rice_retail_kg         //rurual_dummy is a proportion    gini_20
-global control2  rural_prop  gini dummy_wmhead_empl log_osv log_rice_retail_kg   //HH_with_rud_floor_material  gini_2
-gsem (child_size_small_at_birth <- anom_tmax6_POS $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    (log_osv_fut <- child_size_small_at_birth anom_tmax6_POS $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/table_exp_osv.xls", replace keep(child_size_small_at_birth anom_tmax6_POS $control1 $control2) dec(3) nocons 
-
-	Bangladesh study on infant size and food security
-https://dhsprogram.com/publications/journal-details.cfm?article_id=3320&C_id=0&T_ID=0&P_ID=840&r_id=0
-
