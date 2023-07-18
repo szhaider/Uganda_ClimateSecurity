@@ -1,6 +1,15 @@
 
 *******************************WFP Food Prices**********************************
 ********************************************************************************
+/*
+
+Year 2000 is missing in Uganda Prices data.
+If Retail kept, 2006 will be lost.
+So keeping Whoesale and retail both
+But most likely use Wholesale to keep 3 years rounds (2006 + 2011 + 2016)
+Using Maize Wholesale Prices (Uganda Currency)
+*/
+
 ********************************************************************************
 
 *Cleaning and preparing WFP Food Prices data for overlay on Household clusters in QGIS  
@@ -39,12 +48,17 @@ codebook LOC_ID
            Total |     19,301      100.00
 */
 
+tab  year pricetype  //If Retail kept, 2006 will be lost
+
+gen n = _n
+reshape wide price usdprice, i(date admin1 admin2 market latitude longitude n) j(pricetype) s
+
 *Keeping only retail prices
-keep if pricetype == "Retail"    //1,297 obs wholesale
+*keep if pricetype == "Retail"    //1,297 obs wholesale
 
-drop category date date_1 currency pricetype priceflag 		//unit
+drop category date date_1 currency n priceflag 		//unit pricetype
 
-destring price usdprice, replace
+destring *price* price*, replace
 
 /*
     unit |      Freq.     Percent        Cum.
@@ -59,7 +73,7 @@ destring price usdprice, replace
 
 */
 
-collapse price usdprice, by(commodity  LOC_NAME latitude longitude year quarter)
+collapse priceRetail usdpriceRetail priceWholesale usdpriceWholesale, by(commodity  LOC_NAME latitude longitude year quarter)
 
 encode commodity, gen(commodity_1)
 drop commodity
@@ -67,13 +81,48 @@ drop commodity
 *keeping  58   Rice (regular, milled) - since available from 2000-2020
 *keeping maize flour white (38) - since available from 2000-2020
 
-drop if inlist(commodity_1, 2, 3, 6 ,7, 11, 20, 22, 23, 24, 25, 26, 27, 28, 29, 31, ///
- 32, 35, 36,37, 39, 42, 44, 47, 48, 49, 52, 56, 57, 59, 60, 61, 63, 65, 67, 69)
+drop if inlist(commodity_1, 2, 3, 6 ,7, 11, 22, 23, 24, 25, 26, 27, 28, 29, 31, ///
+ 32, 36,37, 39, 42, 44, 47, 48, 49, 52, 56, 57, 59, 60, 61, 63, 65, 67, 69)
 
-keep if commodity_1 == 16 | commodity_1 == 17 
+*Important Crops in Uganda:   corn,  millet, sorghum. 
  
-tab  commodity_1, m
+keep if commodity_1 == 15 | commodity_1 == 16 | commodity_1 == 17 | commodity_1 == 19 | commodity_1 == 20 | commodity_1 == 30 | commodity_1 == 35   // Maize  rice + Sorghum
+ 
+sort year quarter commodity_1
+ 
+tab year commodity_1, m   //2010 onwards with Maize flour)
 /*
+Will use Maize > Rice > maize flour > Sorghum 
+           |                                 commodity_1
+      year |     Maize  Maize (wh  Maize flo     Millet  Millet fl       Rice    Sorghum |     Total
+-----------+-----------------------------------------------------------------------------+----------
+      2006 |        11          0          0          0          0          4          0 |        15 
+      2007 |         7          0          0          0          0          4          0 |        11 
+      2008 |         9          0          0          0          0          4          0 |        13 
+      2009 |         8          0          0          0          0          3          0 |        11 
+      2010 |         9          0         30          0          0          4          0 |        43 
+      2011 |        10         23         31         22          0          4         22 |       112 
+      2012 |        11         28         27         28          0          4         28 |       126 
+      2013 |        12         31         31         31          0          4         30 |       139 
+      2014 |        12         31         30         29          0          4         30 |       136 
+      2015 |        12         23         23         23          0          4         23 |       108 
+      2016 |        12         23         22         23          0          4         22 |       106 
+      2017 |        11         24         23         24          0          4         23 |       109 
+      2018 |        11         23         24         22          0          3         24 |       107 
+      2019 |        14         46         46         40          0          4         47 |       197 
+      2020 |        14         68         65         23         10          4         63 |       247 
+      2021 |        16        107        109         35         52          4        101 |       424 
+      2022 |        15        149        151         86         52          4        142 |       599 
+      2023 |         0        141        139         71         50          0        128 |       529 
+-----------+-----------------------------------------------------------------------------+----------
+     Total |       194        717        751        457        164         66        683 |     3,032 
+
+
+
+If we use Rice, we will be assigning prices of 1 market/Quarter to whole Uganda for all years
+
+Almost 4 markets with Maize (While keeping 2006 intact)	 
+
   commodity_1 |      Freq.     Percent        Cum.
 -------------------------+-----------------------------------
            Maize (white) |        717       48.84       48.84
@@ -99,24 +148,33 @@ gen normalized_price = (price - mean_price) / sd_price   //accounts for units di
 collapse normalized_price , by (commodity  LOC_NAME latitude longitude year quarter)
 */
  
-reshape wide price usdprice, i(latitude longitude year quarter) j(commodity_1)
+reshape wide priceRetail usdpriceRetail priceWholesale usdpriceWholesale, i(latitude longitude year quarter) j(commodity_1)
+
+sort year quarter
+
+drop priceRetail16-usdpriceWholesale35  
+drop priceRetail15 usdpriceRetail15
+
+rename (usdprice* ) (maize_usd)   
+rename (price* )    (maize_uga)   
+
+*Since 2006 HHds are interviewed in quarter 2,3 and 4
+export delimited using "$xlsx/Prices_Data/Prices_quarter2_2006.csv" if year==2006 & quarter==2, replace
+export delimited using "$xlsx/Prices_Data/Prices_quarter3_2006.csv" if year==2006 & quarter==3, replace
+export delimited using "$xlsx/Prices_Data/Prices_quarter4_2006.csv" if year==2006 & quarter==4, replace
+
+*Since 2011 HHds are interviewed in quarter 2 & 3, 4
+export delimited using "$xlsx/Prices_Data/Prices_quarter2_2011.csv" if year==2011 & quarter==2, replace
+export delimited using "$xlsx/Prices_Data/Prices_quarter3_2011.csv" if year==2011 & quarter==3, replace
+export delimited using "$xlsx/Prices_Data/Prices_quarter4_2011.csv" if year==2011 & quarter==4, replace
+
+*Since 2016 HHds are interviewed in quarter 3 & 4
+export delimited using "$xlsx/Prices_Data/Prices_quarter2_2016.csv" if year==2016 & quarter==2, replace
+export delimited using "$xlsx/Prices_Data/Prices_quarter3_2016.csv" if year==2016 & quarter==3, replace
+export delimited using "$xlsx/Prices_Data/Prices_quarter4_2016.csv" if year==2016 & quarter==4, replace
 
 
-rename (usdprice* ) (maize_usd maizefloor_usd)   
-rename (price* )    (maize_uga maizefloor_uga)   
 /*
-*Since 2008 HHds are interviewed in quarter 3
-export delimited using "$xlsx/prices/Price_quarter3_2008.csv" if year==2008 & quarter==3, replace
-
-*Since 2008 HHds are interviewed in quarter 2 & 3
-export delimited using "$xlsx/prices/Price_quarter2_2003.csv" if year==2003 & quarter==2, replace
-export delimited using "$xlsx/prices/Price_quarter3_2003.csv" if year==2003 & quarter==3, replace
-
-*Since 2017 HHds are interviewed in quarter 3 & 4
-export delimited using "$xlsx/prices/Price_quarter3_2017.csv" if year==2017 & quarter==3, replace
-export delimited using "$xlsx/prices/Price_quarter4_2017.csv" if year==2017 & quarter==4, replace
-
-
 *Post QGIS analytics Datasset (To be merged with final datasets)  Combined dataset prepared after joing attributes by the nearest alogortihm in QGIS
 
 import delimited "$xlsx/prices/Final_prices_allyears_allquarters.csv", clear
