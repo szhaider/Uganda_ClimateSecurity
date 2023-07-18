@@ -63,7 +63,7 @@ Date last modified:		July 7, 2023
 
 	local packages 0   //Change to 1 to install packages, once per machine
 	if `packages'{
-		ssc install 
+		ssc install ineqdec0
 	}
 	
 *-------------------------------------------------------------------------------
@@ -178,7 +178,10 @@ Date last modified:		July 7, 2023
 	drop if dhsyear == .
 	rename hv006 month   //Month of interview and month of child birth (to merge with anomalies dataset)
 	save "$output/final_Uganda.dta", replace
-	
+	*---------------------------------------------------------------------------
+	*Gini Coeff Cluster (Cluster based Inequality)
+	do 		./do/Gini_cluster.do
+
 	*---------------------------------------------------------------------------
 	*Merging Temperature and Precipitation Anomalies datasets (Extracted from .nc files and prepared in R - Using the prepared datasets here)
 	*Combined Temperature and precipitation dataset 

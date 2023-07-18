@@ -883,10 +883,32 @@ order hhid
 gen wat_avl_prms = hv204 == 996
 replace wat_avl_prms = . if hv204 == .
 
+
+*Poverty (Bottom 20 and 40 percent) Based on Wealth Index Combined
+/*
+definition
+           1   lowest
+           2   second
+           3   middle
+           4   fourth
+           5   highest
+
+   variables:  wealth_index
+
+*/
+*Bottom 20
+gen pov_hd_bot_20 = wealth_index == 1
+replace pov_hd_bot_20 = . if wealth_index == .
+
+*Bottom 40
+gen pov_hd_bot_40 = inrange(wealth_index, 1, 2)
+replace pov_hd_bot_40 = . if missing(wealth_index)
+
+
 * Year
 gen year=2000
 
-collapse hv003 hv005 hv007 hv021 hv022 hv023 hv006 hv008 hv009 type_place region hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 year wealth_index wealth_index_score  hv219 hv220 hv209 hv210 hv211 hv212  hv221  popwt   wat_avl_prms , by (hhid v001 v002 )
+collapse hv003 hv005 hv007 hv021 hv022 hv023 hv006 hv008 hv009 type_place region hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 year wealth_index wealth_index_score  hv219 hv220 hv209 hv210 hv211 hv212  hv221  popwt   wat_avl_prms pov_hd_bot_20 pov_hd_bot_40, by (hhid v001 v002 )
 
 sort hhid v001 v002
 

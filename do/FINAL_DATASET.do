@@ -91,7 +91,8 @@ rename  type_place rural_urban
 
 collapse (mean) prec prec_rollMean_* temp temp_rollMean_* ///
 access_electricity=hv206 own_radio=hv207 own_tv=hv208 own_refrigerator=hv209 own_bicycle=hv210 own_scooter=hv211 own_car=hv212 own_telephone= hv221  ///
-HH_head_female	HH_head_age= hv220 hhsize = hv009 ///						
+HH_head_female	HH_head_age= hv220 hhsize = hv009 ///	
+pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score /// Poverty (Bottom 20 & 40 percent) & Inequlaity					
 head_* ///  //Household Head characteristics (Ocuupation (women + men), Education (women + men), )
 hh_head_* /// Household head education (no, prim, sec, higher)
 RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* /// women BMI, Rohrer's index (low/very low), Severe/Moderate Anemia-women, 
@@ -141,7 +142,8 @@ unique grid_id  				 //380 unique ids
 
 collapse (mean) prec prec_rollMean_* temp temp_rollMean_* ///
 access_electricity own_radio own_tv own_refrigerator own_bicycle own_scooter own_car own_telephone  ///
-HH_head_female	HH_head_age hhsize  ///						
+HH_head_female	HH_head_age hhsize  ///				
+pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score ///		
 head_* ///  
 hh_head_* /// 
 RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* ///  

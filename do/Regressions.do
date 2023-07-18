@@ -394,8 +394,7 @@ nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$pr
 
 
 *-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
+
 *Models 3 (Positive Temperature anomalies)  pos temp not significant in general  (Significant for 3 month protests)
 
 *Mediation	- by Stunitng and  temp anamoly
@@ -419,10 +418,6 @@ nlcom _b[stunted_ch:$temp_anamoly] * _b[$conflict:stunted_ch]
 * Total 
 nlcom _b[stunted_ch:$temp_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$temp_anamoly]
 
-*-------------------------------------------------------------------------------
-
-*-------------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 
 *Models 4
