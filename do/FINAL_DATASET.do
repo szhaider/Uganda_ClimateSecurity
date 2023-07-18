@@ -1,7 +1,7 @@
 
 *Final Dataset (DHS + Clmate anomalies + Conflicts + Prices)
 
-*DHS + Geo + Climate Dataset - All Years
+*DHS + Geo + Climate Dataset + Prices + Grid - All Years
 *merged DHS household and climate dataset at household level
 use "results/Final_Uganda_DHS_GEO_CLimate.dta", clear
 
@@ -11,6 +11,12 @@ order dhsclust longnum latnum dhsyear quarter
 gen HH_head_female = hv219  == 2    // Proportion of female headed households
 
 gen rural_prop = type_place == 2   // Proportion of rural households
+
+
+*Dummy for employed weomen head
+gen share_wmhead_unempl = head_un_wm != 0
+replace share_wmhead_unempl = . if head_un_wm == .
+label var share_wmhead_unempl  "Dummy for unemployed women head"
 
 
 gen HH_with_rud_floor_material = inrange(hv213, 10, 22)    //Proportion of households with rudimentary floor material									
@@ -87,12 +93,45 @@ Region Label (F.Es)
 */
 
 rename  type_place rural_urban
+
+
+* MAX TEMP DUMMY POSITIVE
+gen share_tmax12_pos =  temp_rollMean_p12 > 0 
+gen share_tmax9_pos  =  temp_rollMean_p9  > 0
+gen share_tmax6_pos  =  temp_rollMean_p6  > 0 
+gen share_tmax3_pos  =  temp_rollMean_p3  > 0 
+
+gen  share_rain12_neg =  prec_rollMean_p12  < 0
+gen  share_rain9_neg  =  prec_rollMean_p9   < 0 
+gen  share_rain6_neg  =  prec_rollMean_p6   < 0 
+gen  dummy_rain3_neg  =  prec_rollMean_p3   < 0 
+
+*------------------------------------------------------------------------
+
+*Further dummies (Construct here!)
+gen new_dietary_diversity_sum = 0
+replace new_dietary_diversity_sum=1 if new_No_min_diet_diversity_hh >= 0.5
+replace new_dietary_diversity_sum = . if new_No_min_diet_diversity_hh == .
+
+gen new_dietary_diversity_sum_30 = 0
+replace new_dietary_diversity_sum_30=1 if new_No_min_diet_diversity_hh >= 0.3
+replace new_dietary_diversity_sum_30 = . if new_No_min_diet_diversity_hh == .
+
+
+gen new_dietary_diversity_sum_80 = 0
+replace new_dietary_diversity_sum_80=1 if new_No_min_diet_diversity_hh >= 0.8
+replace new_dietary_diversity_sum_80 = . if new_No_min_diet_diversity_hh == .
+
+*------------------------------------------------------------------------
+
+
 *-------------------------------------------------------------------------------
 
-collapse (mean) prec prec_rollMean_* temp temp_rollMean_* ///
+collapse (mean) prec prec_rollMean_* temp temp_rollMean_* share_tmax* share_rain* ///
 access_electricity=hv206 own_radio=hv207 own_tv=hv208 own_refrigerator=hv209 own_bicycle=hv210 own_scooter=hv211 own_car=hv212 own_telephone= hv221  ///
 HH_head_female	HH_head_age= hv220 hhsize = hv009 ///	
-pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score /// Poverty (Bottom 20 & 40 percent) & Inequlaity					
+pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score /// Poverty (Bottom 20 & 40 percent) & Inequlaity	
+share_wmhead_unempl ///				
 head_* ///  //Household Head characteristics (Ocuupation (women + men), Education (women + men), )
 hh_head_* /// Household head education (no, prim, sec, higher)
 RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* /// women BMI, Rohrer's index (low/very low), Severe/Moderate Anemia-women, 
@@ -100,6 +139,7 @@ stunted_ch wasted_ch underwht_ch 	nt_ch_sev_anem		///   Stunt, Wast, Underw, Mod
 HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
 No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast min_diet_diversity   /// children diet and food nutrition No_min_meal_freq_hh Meal_freq_hh
 new_No_min_diet_diversity_hh nt_mdd min_meal_freq_bf_inf min_meal_freq_bf_child /// children diet and food nutrition
+new_dietary_diversity_* ///
 (sum) tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
 No_of_lowrohrer_w=tot_RI_Low_w No_of_lowBMI_w=DHS_tot_BMI_low_w No_of_anem_w=sev_mod_anemia_hh /// number of stunted, wasted, underweight , low rohrer women, 	low BMI women										
 (median) median_wealth_index_quintile=wealth_index median_wealth_index_score=wealth_index_score  ///
@@ -110,12 +150,42 @@ sort dhsyear dhsclust
 *Final Conflicts Data - all years
 merge 1:1 dhsyear dhsclust quarter using "$results/final_conflicts_DHS_Uganda.dta", nogen  // All matched
 
-/*
+
+
 *Final Prices Data - All years
-merge m:1 dhsclust  dhsyear quarter     using "$output/prices.dta"   // Allmatched   
+merge m:1  dhsyear quarter    dhsclust   using "$output/prices.dta"   // Unmatched belong to 2000, which will be dropped sice we don't have prices for 2000 in WFP data 
 keep if _m == 3
 drop _m
-*/
+
+*-------------------------------------------------------------------------------
+*Conflict dummies
+
+gen share_battles_p = battles_present_number_of_confli >= 1
+label var share_battles_p "Present battles - dummy"
+
+gen share_battles_f = battles_future_number_of_conflic >=1
+label var share_battles_f "Future battles - dummy"
+
+gen share_vac_p = vac_present_number_of_conflicts >= 1
+label var share_vac_p "Present vac - dummy"
+
+gen share_vac_f = vac_future_number_of_conflicts >=1
+label var share_vac_f "Future vac - dummy"
+
+gen share_riots_p = riots_present_number_of_conflict >= 1
+label var share_riots_p "Present riots - dummy"
+
+gen share_riots_f = riots_future_number_of_conflicts >=1
+label var share_riots_f "Future riots - dummy"
+
+
+gen share_protests_p = protests_present_number_of_confl >= 1
+label var share_protests_p "Present protests - dummy"
+
+gen share_protests_f = protests_future_number_of_confli >=1
+label var share_protests_f "Future protests - dummy"
+
+*-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 *Merging Grid level Data
 
@@ -127,7 +197,7 @@ drop _m
 	*save "$results/Final_Grid.dta", replace
 */
 
-merge 1:1 dhsclust dhsyear quarter  using "$results/Final_Grid.dta" , nogen   //All matched
+merge 1:1 dhsclust dhsyear quarter  using "$results/Final_Grid.dta" , keep(3) nogen   //All matched  (275 unmatched for dhsyear 2000 since it is dropped with prices)
 
 rename id grid_id
 order grid_id
@@ -143,7 +213,8 @@ unique grid_id  				 //380 unique ids
 collapse (mean) prec prec_rollMean_* temp temp_rollMean_* ///
 access_electricity own_radio own_tv own_refrigerator own_bicycle own_scooter own_car own_telephone  ///
 HH_head_female	HH_head_age hhsize  ///				
-pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score ///		
+pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score ///	
+ share_* ///	
 head_* ///  
 hh_head_* /// 
 RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* ///  
@@ -151,6 +222,7 @@ stunted_ch wasted_ch underwht_ch 	nt_ch_sev_anem		///
 HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
 No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast min_diet_diversity   /// 
 new_No_min_diet_diversity_hh nt_mdd min_meal_freq_bf_inf min_meal_freq_bf_child ///
+maize_uga maize_usd /// maize prices 
 (sum) tot_* No_of_stunt No_of_wast No_of_undw No_of_anemic ///
 No_of_lowrohrer_w No_of_lowBMI_w No_of_anem_w *_present_* *_future_* /// 	 									
 (median) median_wealth_index_quintile median_wealth_index_score,  ///
@@ -162,21 +234,6 @@ by(grid_id dhsyear quarter region rural_urban)
 *------------------------------------------------------------------------
 *Descriptive stats table of final variables of interest
 
-*Dummy for employed weomen head
-gen dummy_wmhead_unempl = head_un_wm != 0
-replace dummy_wmhead_unempl = . if head_un_wm == .
-label var dummy_wmhead_unempl  "Dummy for unemployed women head"
-
-* MAX TEMP DUMMY POSITIVE
-gen dummy_tmax12_pos =  temp_rollMean_p12 > 0 
-gen dummy_tmax9_pos  =  temp_rollMean_p9  > 0
-gen dummy_tmax6_pos  =  temp_rollMean_p6  > 0 
-gen dummy_tmax3_pos  =  temp_rollMean_p3  > 0 
-
-gen  dummy_rain12_neg =  prec_rollMean_p12  < 0
-gen  dummy_rain9_neg  =  prec_rollMean_p9   < 0 
-gen  dummy_rain6_neg  =  prec_rollMean_p6   < 0 
-gen  dummy_rain3_neg  =  prec_rollMean_p3   < 0 
 
 * For descriptives Table
 *Main Vars of interest
@@ -211,52 +268,6 @@ using "$results/Descriptive_Table.rtf", replace   ///
 addnotes("Source: Author's Calculations") ///
 title("TABLE 1. DESCRIPTIVE STATISTICS: MAIN VARIABLES OF INTEREST")
 
-*------------------------------------------------------------------------
-
-*Further dummies (Construct here!)
-gen new_dietary_diversity_sum = 0
-replace new_dietary_diversity_sum=1 if new_No_min_diet_diversity_hh >= 0.5
-replace new_dietary_diversity_sum = . if new_No_min_diet_diversity_hh == .
-
-gen new_dietary_diversity_sum_30 = 0
-replace new_dietary_diversity_sum_30=1 if new_No_min_diet_diversity_hh >= 0.3
-replace new_dietary_diversity_sum_30 = . if new_No_min_diet_diversity_hh == .
-
-
-gen new_dietary_diversity_sum_80 = 0
-replace new_dietary_diversity_sum_80=1 if new_No_min_diet_diversity_hh >= 0.8
-replace new_dietary_diversity_sum_80 = . if new_No_min_diet_diversity_hh == .
-
-*------------------------------------------------------------------------
-*-------------------------------------------------------------------------------
-*Conflict dummies
-
-gen dummy_battles_p = battles_present_number_of_confli >= 1
-label var dummy_battles_p "Present battles - dummy"
-
-gen dummy_battles_f = battles_future_number_of_conflic >=1
-label var dummy_battles_f "Future battles - dummy"
-
-gen dummy_vac_p = vac_present_number_of_conflicts >= 1
-label var dummy_vac_p "Present vac - dummy"
-
-gen dummy_vac_f = vac_future_number_of_conflicts >=1
-label var dummy_vac_f "Future vac - dummy"
-
-gen dummy_riots_p = riots_present_number_of_conflict >= 1
-label var dummy_riots_p "Present riots - dummy"
-
-gen dummy_riots_f = riots_future_number_of_conflicts >=1
-label var dummy_riots_f "Future riots - dummy"
-
-
-gen dummy_protests_p = protests_present_number_of_confl >= 1
-label var dummy_protests_p "Present protests - dummy"
-
-gen dummy_protests_f = protests_future_number_of_confli >=1
-label var dummy_protests_f "Future protests - dummy"
-
-*-------------------------------------------------------------------------------
 
 *-------------------------------------------------------------------------------
 compress

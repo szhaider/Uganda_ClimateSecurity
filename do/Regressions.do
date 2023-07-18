@@ -330,8 +330,8 @@ nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
 nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
 *-------------------------------------------------------------------------------
 *Mediation	- by Stunting and Rainfall anamoly   (Only 12, 9 works)
-global control1  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
-global control2  rural_prop   dummy_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
+global control1  rural_prop   share_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres underwht_ch   No_min_diet_diversity_hh    //nt_ch_sev_anem   RI_Low_w anom_tmax12_POS
+global control2  rural_prop   share_wmhead_unempl  HH_with_improved_tiolet  log_vac_pres   underwht_ch  No_min_diet_diversity_hh   //nt_ch_sev_anem RI_Low_w anom_tmax12_POS
 global prec_anamoly "anom_rain12_POS" 	
 global conflict "log_vac_fut"   
 

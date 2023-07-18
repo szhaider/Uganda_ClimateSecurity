@@ -64,6 +64,7 @@ Date last modified:		July 7, 2023
 	local packages 0   //Change to 1 to install packages, once per machine
 	if `packages'{
 		ssc install ineqdec0
+		ssc install touch
 	}
 	
 *-------------------------------------------------------------------------------
@@ -207,7 +208,33 @@ Date last modified:		July 7, 2023
 	
 	*Cleaning conflicts data from excel input (ACLED)
 	do      ./do/Conflicts_data_prep.do
+	*---------------------------------------------------------------------------
+
+	*Preparing Maize Prices data after QGIS data prep (Year-Quarter Wise) QGIS Algorithm: Join attributes by the nearest
 	
+	foreach n of numlist 2006 2011 2016{
+		forvalues i = 2(1)4{
+		import delimited "$qgis/DHSclusters_Prices_quarter`i'_`n'.csv", clear
+		save "$output/DHSclusters_Prices_quarter`i'_`n'.dta", replace
+		}
+	}
+	
+	*rm "$output/prices.dta"
+	touch "$output/prices"
+	
+	local files: dir "$output/" files "DHSclusters_Prices_*.dta"
+	di `files'
+	
+	foreach f of local files{
+		append using  "$output/`f'"
+		drop quarter_2 n year
+	}
+	
+	sort dhsyear quarter dhsclust
+	
+	bysort dhsyear dhsclust quarter: gen n=_n if dhsyear == 2016
+	drop if n > 1 & dhsyear == 2016
+	save "$output/prices", replace
 	*---------------------------------------------------------------------------
 	*Preparing DHS Cluster - Quarter - Year Mapping for buffers calculation in R & Grid creation in QGIS
 	/*
