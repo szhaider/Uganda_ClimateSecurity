@@ -1,7 +1,10 @@
 
 *Final Dataset (DHS + Clmate anomalies + Conflicts + Prices)
 
-*DHS + Geo + Climate Dataset + Prices + Grid - All Years
+*DHS + Geo + Climate Dataset + Prices + Grid - All Years  [For prices: 2000 drppoed since WFP prices data begins by 2006 & only maize covers all years from 2006]
+
+*DROP Prices if choose to include DHS 2000
+
 *merged DHS household and climate dataset at household level
 use "results/Final_Uganda_DHS_GEO_CLimate.dta", clear
 
@@ -16,7 +19,7 @@ gen rural_prop = type_place == 2   // Proportion of rural households
 *Dummy for employed weomen head
 gen share_wmhead_unempl = head_un_wm != 0
 replace share_wmhead_unempl = . if head_un_wm == .
-label var share_wmhead_unempl  "Dummy for unemployed women head"
+label var share_wmhead_unempl  "Share for unemployed women head"
 
 
 gen HH_with_rud_floor_material = inrange(hv213, 10, 22)    //Proportion of households with rudimentary floor material									
@@ -104,7 +107,7 @@ gen share_tmax3_pos  =  temp_rollMean_p3  > 0
 gen  share_rain12_neg =  prec_rollMean_p12  < 0
 gen  share_rain9_neg  =  prec_rollMean_p9   < 0 
 gen  share_rain6_neg  =  prec_rollMean_p6   < 0 
-gen  dummy_rain3_neg  =  prec_rollMean_p3   < 0 
+gen  share_rain3_neg  =  prec_rollMean_p3   < 0 
 
 *------------------------------------------------------------------------
 
@@ -234,7 +237,7 @@ by(grid_id dhsyear quarter region rural_urban)
 *------------------------------------------------------------------------
 *Descriptive stats table of final variables of interest
 
-
+/*
 * For descriptives Table
 *Main Vars of interest
 
@@ -267,7 +270,7 @@ esttab matrix(d, fmt(2 2 2 2 2 ))  ///
 using "$results/Descriptive_Table.rtf", replace   ///
 addnotes("Source: Author's Calculations") ///
 title("TABLE 1. DESCRIPTIVE STATISTICS: MAIN VARIABLES OF INTEREST")
-
+*/
 
 *-------------------------------------------------------------------------------
 compress
