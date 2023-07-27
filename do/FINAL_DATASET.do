@@ -98,6 +98,11 @@ Region Label (F.Es)
 rename  type_place rural_urban
 
 
+*Proprotion of ag employed hhds
+
+rename     hv244     agri_land_hhds
+
+
 * MAX TEMP DUMMY POSITIVE
 gen share_tmax12_pos =  temp_rollMean_p12 > 0 
 gen share_tmax9_pos  =  temp_rollMean_p9  > 0
@@ -136,7 +141,7 @@ HH_head_female	HH_head_age= hv220 hhsize = hv009 ///
 pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score /// Poverty (Bottom 20 & 40 percent) & Inequlaity	
 share_wmhead_unempl ///				
 head_* ///  //Household Head characteristics (Ocuupation (women + men), Education (women + men), )
-hh_head_* /// Household head education (no, prim, sec, higher)
+hh_head_* agri_land_hhds /// Household head education (no, prim, sec, higher)
 RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* /// women BMI, Rohrer's index (low/very low), Severe/Moderate Anemia-women, 
 stunted_ch wasted_ch underwht_ch 	nt_ch_sev_anem		///   Stunt, Wast, Underw, Moderate/severe Anemia
 HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
@@ -219,7 +224,7 @@ HH_head_female	HH_head_age hhsize  ///
 pov_hd_bot_20 pov_hd_bot_40  gini wealth_index_score ///	
  share_* ///	
 head_* ///  
-hh_head_* /// 
+hh_head_* agri_land_hhds /// 
 RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* ///  
 stunted_ch wasted_ch underwht_ch 	nt_ch_sev_anem		///  
 HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
