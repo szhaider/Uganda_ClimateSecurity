@@ -1,0 +1,23 @@
+	(1)	(2)	(3)
+VARIABLES	log_wholesale_maize_uga	log_battles_fut	/
+			
+log_wholesale_maize_uga		0.882**	
+		(0.415)	
+anom_tmax12_POS	0.015	-0.035	
+	(0.023)	(0.208)	
+rural_prop	-0.010	-0.076	
+	(0.007)	(0.065)	
+agri_land_hhds	-0.003	-0.027	
+	(0.004)	(0.042)	
+hh_head_primary	0.006	-0.449***	
+	(0.013)	(0.128)	
+share_wmhead_unempl	-0.095	-0.439	
+	(0.059)	(0.536)	
+stunted_ch	-0.003	0.122	
+	(0.011)	(0.098)	
+log_battles_pres	-0.006	0.448***	
+	(0.011)	(0.105)	
+			
+Observations	506	506	506
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

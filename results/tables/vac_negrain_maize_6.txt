@@ -1,0 +1,25 @@
+	(1)	(2)	(3)
+VARIABLES	log_wholesale_maize_uga	log_vac_fut	/
+			
+log_wholesale_maize_uga		-0.510	
+		(0.434)	
+anom_rain6_NEG	0.071***	-0.013	
+	(0.018)	(0.156)	
+rural_prop	-0.003	-0.078	
+	(0.007)	(0.061)	
+head_ag_m	-0.012	-0.130*	
+	(0.008)	(0.071)	
+agri_land_hhds	0.001	-0.043	
+	(0.004)	(0.037)	
+hh_head_primary	0.016	-0.257**	
+	(0.014)	(0.121)	
+share_wmhead_unempl	-0.094	0.095	
+	(0.058)	(0.481)	
+stunted_ch	0.000	0.005	
+	(0.011)	(0.089)	
+log_vac_pres	-0.010	0.681***	
+	(0.007)	(0.056)	
+			
+Observations	493	493	493
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			
