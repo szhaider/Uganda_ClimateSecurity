@@ -151,7 +151,7 @@ new_dietary_diversity_* ///
 (sum) tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
 No_of_lowrohrer_w=tot_RI_Low_w No_of_lowBMI_w=DHS_tot_BMI_low_w No_of_anem_w=sev_mod_anemia_hh /// number of stunted, wasted, underweight , low rohrer women, 	low BMI women										
 (median) median_wealth_index_quintile=wealth_index median_wealth_index_score=wealth_index_score  ///
-[pw=wgt], by (dhsyear quarter region dhsclust latnum longnum rural_urban)  // no. of regions goes down back in early years 
+[pw=wgt], by (dhsyear quarter region dhsclust latnum longnum )  //rural_urban, no. of regions goes down back in early years 
 
 sort dhsyear dhsclust
 *-------------------------------------------------------------------------------
@@ -234,7 +234,7 @@ maize_uga maize_usd /// maize prices
 (sum) tot_* No_of_stunt No_of_wast No_of_undw No_of_anemic ///
 No_of_lowrohrer_w No_of_lowBMI_w No_of_anem_w *_present_* *_future_* /// 	 									
 (median) median_wealth_index_quintile median_wealth_index_score,  ///
-by(grid_id dhsyear quarter region rural_urban)         
+by(grid_id dhsyear quarter region )         //rural_urban
 
 
 *duplicates report grid_id dhsyear quarter region    //no repetitions  

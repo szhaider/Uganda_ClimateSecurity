@@ -1,0 +1,21 @@
+	(1)	(2)	(3)
+VARIABLES	stunted_ch	log_riots_fut	/
+			
+stunted_ch		-0.015	
+		(0.050)	
+anom_tmax12_POS	0.033	0.049	
+	(0.062)	(0.087)	
+rural_prop	0.067**	-0.132***	
+	(0.027)	(0.038)	
+agri_land_hhds	0.013	-0.011	
+	(0.018)	(0.025)	
+hh_head_primary	0.080	-0.045	
+	(0.049)	(0.069)	
+share_wmhead_unempl	-0.021	0.486*	
+	(0.194)	(0.266)	
+log_riots_pres	-0.124	-0.255	
+	(0.171)	(0.232)	
+			
+Observations	884	884	884
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

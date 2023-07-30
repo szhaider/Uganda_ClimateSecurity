@@ -1,0 +1,21 @@
+	(1)	(2)	(3)
+VARIABLES	stunted_ch	log_battles_fut	/
+			
+stunted_ch		0.115*	
+		(0.067)	
+anom_rain12_NEG	0.120**	0.146	
+	(0.061)	(0.107)	
+rural_prop	0.077***	-0.073	
+	(0.026)	(0.047)	
+agri_land_hhds	0.014	-0.039	
+	(0.018)	(0.033)	
+hh_head_primary	0.076	-0.283***	
+	(0.049)	(0.088)	
+share_wmhead_unempl	-0.049	-0.018	
+	(0.193)	(0.341)	
+log_battles_pres	-0.002	0.319***	
+	(0.041)	(0.071)	
+			
+Observations	884	884	884
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			

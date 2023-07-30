@@ -1,0 +1,21 @@
+	(1)	(2)	(3)
+VARIABLES	stunted_ch	log_vac_fut	/
+			
+stunted_ch		-0.026	
+		(0.076)	
+anom_rain9_NEG	0.020	-0.036	
+	(0.046)	(0.073)	
+rural_prop	0.054*	-0.066	
+	(0.032)	(0.052)	
+agri_land_hhds	0.023	-0.083	
+	(0.055)	(0.088)	
+hh_head_primary	0.106*	-0.303***	
+	(0.059)	(0.095)	
+share_wmhead_unempl	-0.041	0.077	
+	(0.220)	(0.346)	
+log_vac_pres	0.034	0.183***	
+	(0.039)	(0.061)	
+			
+Observations	631	631	631
+Standard errors in parentheses			
+*** p<0.01, ** p<0.05, * p<0.1			
