@@ -287,186 +287,6 @@ gen log_wholesale_maize_usd = log(maize_usd)
 *-------------------------------------------------------------------------------
 
 *-------------------------------------------------------------------------------
-*PRICES REGRESSIONS & Rainfall
-
-*Mediation	- by Maize Prices - Negative Rainfall anamoly
-
-*Battles & negative rainfalls (Works best without region FEs)      No convergence with Region FEs   (Prices:region mapping same as Philippines but no convergence)       
-
-global control1  rural_prop     agri_land_hhds    hh_head_primary  share_wmhead_unempl stunted_ch log_battles_pres        
-global control2  rural_prop      agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_battles_pres    
-global prec_anamoly "anom_rain9_NEG" 	  
-global conflict "log_battles_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1  i.quarter#i.dhsyear  M1[grid_id]) /// i.region
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2  i.quarter#i.dhsyear  M1[grid_id]), latent(M1) nocapslatent difficult //i.region
-
-	outreg2 using "$results/tables/battles_negrain_maize_9.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-*------------------
-*------------------
-****Battles and positive temp anamoly 
-
-global control1  rural_prop     agri_land_hhds    hh_head_primary  share_wmhead_unempl stunted_ch log_battles_pres        //
-global control2  rural_prop      agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_battles_pres     //
-global temp_anamoly "anom_tmax3_POS" 	  
-global conflict "log_battles_fut"   
-
-gsem (log_wholesale_maize_uga <- $temp_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/battles_postemp_maize_3.xls", replace keep(log_wholesale_maize_uga $temp_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$temp_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$temp_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$temp_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$temp_anamoly]
-
-*********************
-*VAC and Negative Rainfall anamoly
-
-global control1  rural_prop head_ag_m  agri_land_hhds hh_head_primary  share_wmhead_unempl stunted_ch log_vac_pres       
-global control2  rural_prop   head_ag_m agri_land_hhds hh_head_primary share_wmhead_unempl stunted_ch log_vac_pres    
-global prec_anamoly "anom_rain9_NEG" 	
-global conflict "log_vac_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/vac_negrain_maize_9.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-*------------------
-*------------------
-
-*VAC & Positive Temp anamoly
-
-global control1  rural_prop head_ag_m  agri_land_hhds hh_head_primary  share_wmhead_unempl stunted_ch log_vac_pres      
-global control2  rural_prop   head_ag_m agri_land_hhds hh_head_primary share_wmhead_unempl stunted_ch log_vac_pres     
-global prec_anamoly "anom_tmax12_POS" 	
-global conflict "log_vac_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/vac_postemp_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-
-*********************
-*Riots & Negative rainfall anamoly
-
-global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_riots_pres       
-global control2  rural_prop   head_ag_m  agri_land_hhds   hh_head_primary share_wmhead_unempl stunted_ch log_riots_pres     
-global prec_anamoly "anom_rain12_NEG" 	
-global conflict "log_riots_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear  M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/riots_negrain_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-*------------------
-*------------------
-* Pos Temp and riots
-
-global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_riots_pres       
-global control2  rural_prop   head_ag_m  agri_land_hhds   hh_head_primary share_wmhead_unempl stunted_ch log_riots_pres    
-global prec_anamoly "anom_tmax12_POS" 	
-global conflict "log_riots_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear    M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear   M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/riots_postemp_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-
-*********************
-*Protests& Negative rainfall anamoly
-
-global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_protests_pres       
-global control2  rural_prop  head_ag_m  agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_protests_pres     
-global prec_anamoly "anom_rain12_NEG" 
-global conflict "log_protests_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear  i.region  M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear  i.region  M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/protests_negrain_maize_3.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-*------------------
-*------------------
-*Protests and Pos temp anamoly
-
-global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_protests_pres       
-global control2  rural_prop  head_ag_m  agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_protests_pres     
-global prec_anamoly "anom_tmax12_POS" 	
-global conflict "log_protests_fut"   
-
-gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
-    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
-
-	outreg2 using "$results/tables/protests_postemp_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
-
-* Direct
-nlcom  _b[$conflict:$prec_anamoly]
-
-* Indirect
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
-
-* Total 
-nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
-*-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
 *-------------------------------------------------------------------------------
@@ -665,6 +485,191 @@ nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch]
 
 * Total 
 nlcom _b[stunted_ch:$prec_anamoly] * _b[$conflict:stunted_ch] + _b[$conflict:$prec_anamoly]
+*-------------------------------------------------------------------------------
+
+
+*-------------------------------------------------------------------------------
+*PRICES REGRESSIONS & Rainfall
+
+*Mediation	- by Maize Prices - Negative Rainfall anamoly
+
+*Battles & negative rainfalls (Works best without region FEs)      No convergence with Region FEs   (Prices:region mapping same as Philippines but no convergence)       
+
+global control1  rural_prop     agri_land_hhds    hh_head_primary  share_wmhead_unempl stunted_ch log_battles_pres        
+global control2  rural_prop      agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_battles_pres    
+global prec_anamoly "anom_rain9_NEG" 	  
+global conflict "log_battles_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1  i.quarter#i.dhsyear  M1[grid_id]) /// i.region
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2  i.quarter#i.dhsyear  M1[grid_id]), latent(M1) nocapslatent difficult //i.region
+
+	outreg2 using "$results/tables/battles_negrain_maize_9.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+*------------------
+*------------------
+****Battles and positive temp anamoly 
+
+global control1  rural_prop     agri_land_hhds    hh_head_primary  share_wmhead_unempl stunted_ch log_battles_pres        //
+global control2  rural_prop      agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_battles_pres     //
+global temp_anamoly "anom_tmax3_POS" 	  
+global conflict "log_battles_fut"   
+
+gsem (log_wholesale_maize_uga <- $temp_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $temp_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/battles_postemp_maize_3.xls", replace keep(log_wholesale_maize_uga $temp_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$temp_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$temp_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$temp_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$temp_anamoly]
+
+*********************
+*VAC and Negative Rainfall anamoly
+
+global control1  rural_prop head_ag_m  agri_land_hhds hh_head_primary  share_wmhead_unempl stunted_ch log_vac_pres       
+global control2  rural_prop   head_ag_m agri_land_hhds hh_head_primary share_wmhead_unempl stunted_ch log_vac_pres    
+global prec_anamoly "anom_rain9_NEG" 	
+global conflict "log_vac_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/vac_negrain_maize_9.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+*------------------
+*------------------
+
+*VAC & Positive Temp anamoly
+
+global control1  rural_prop head_ag_m  agri_land_hhds hh_head_primary  share_wmhead_unempl stunted_ch log_vac_pres      
+global control2  rural_prop   head_ag_m agri_land_hhds hh_head_primary share_wmhead_unempl stunted_ch log_vac_pres     
+global prec_anamoly "anom_tmax12_POS" 	
+global conflict "log_vac_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/vac_postemp_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+
+*********************
+*Riots & Negative rainfall anamoly
+
+global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_riots_pres       
+global control2  rural_prop   head_ag_m  agri_land_hhds   hh_head_primary share_wmhead_unempl stunted_ch log_riots_pres     
+global prec_anamoly "anom_rain12_NEG" 	
+global conflict "log_riots_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear  M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/riots_negrain_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+*------------------
+*------------------
+* Pos Temp and riots
+
+global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_riots_pres       
+global control2  rural_prop   head_ag_m  agri_land_hhds   hh_head_primary share_wmhead_unempl stunted_ch log_riots_pres    
+global prec_anamoly "anom_tmax12_POS" 	
+global conflict "log_riots_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear    M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear   M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/riots_postemp_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+
+*********************
+*Protests& Negative rainfall anamoly
+
+global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_protests_pres       
+global control2  rural_prop  head_ag_m  agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_protests_pres     
+global prec_anamoly "anom_rain12_NEG" 
+global conflict "log_protests_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear    M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear   M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/protests_negrain_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+*------------------
+*------------------
+*Protests and Pos temp anamoly
+
+global control1  rural_prop  head_ag_m  agri_land_hhds   hh_head_primary  share_wmhead_unempl stunted_ch log_protests_pres       
+global control2  rural_prop  head_ag_m  agri_land_hhds    hh_head_primary share_wmhead_unempl stunted_ch log_protests_pres     
+global prec_anamoly "anom_tmax12_POS" 	
+global conflict "log_protests_fut"   
+
+gsem (log_wholesale_maize_uga <- $prec_anamoly  $control1 i.quarter#i.dhsyear i.region M1[grid_id]) ///
+    ($conflict <- log_wholesale_maize_uga $prec_anamoly $control2 i.quarter#i.dhsyear i.region M1[grid_id]), latent(M1) nocapslatent difficult
+
+	outreg2 using "$results/tables/protests_postemp_maize_12.xls", replace keep(log_wholesale_maize_uga $prec_anamoly $control1 $control2) dec(3) nocons 
+
+* Direct
+nlcom  _b[$conflict:$prec_anamoly]
+
+* Indirect
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga]
+
+* Total 
+nlcom _b[log_wholesale_maize_uga:$prec_anamoly] * _b[$conflict:log_wholesale_maize_uga] + _b[$conflict:$prec_anamoly]
+
+
 *-------------------------------------------------------------------------------
 /*
 *Model 4 (Temp-Poverty worls better) works with i.region#i.dhsyear
