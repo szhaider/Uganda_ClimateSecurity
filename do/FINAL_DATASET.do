@@ -5,6 +5,15 @@
 
 *DROP Prices if choose to include DHS 2000
 
+
+
+*NOTE: After discussion with the team, inlcude DHS 2000 if stunting finalized as mediator. Only re-run for Battles and Riots for final report tables.
+
+
+
+
+
+
 *merged DHS household and climate dataset at household level
 use "results/Final_Uganda_DHS_GEO_CLimate.dta", clear
 
@@ -101,6 +110,7 @@ rename  type_place rural_urban
 *Proprotion of ag employed hhds
 
 rename     hv244     agri_land_hhds
+*replace agri_land_hhds = 0 if agri_land_hhds == 9   // miscoded
 
 
 * MAX TEMP DUMMY POSITIVE
@@ -151,7 +161,7 @@ new_dietary_diversity_* ///
 (sum) tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
 No_of_lowrohrer_w=tot_RI_Low_w No_of_lowBMI_w=DHS_tot_BMI_low_w No_of_anem_w=sev_mod_anemia_hh /// number of stunted, wasted, underweight , low rohrer women, 	low BMI women										
 (median) median_wealth_index_quintile=wealth_index median_wealth_index_score=wealth_index_score  ///
-[pw=wgt], by (dhsyear quarter region dhsclust latnum longnum )  //rural_urban, no. of regions goes down back in early years 
+[pw=wgt], by (dhsyear quarter region dhsclust latnum longnum )  // no. of regions goes down back in early years 
 
 sort dhsyear dhsclust
 *-------------------------------------------------------------------------------
@@ -242,15 +252,15 @@ by(grid_id dhsyear quarter region )         //rural_urban
 *------------------------------------------------------------------------
 *Descriptive stats table of final variables of interest
 
-/*
+
 * For descriptives Table
 *Main Vars of interest
-
-glo vars "stunted_ch wasted_ch underwht_ch 	nt_ch_sev_anem	RI_Low_w nt_wm_modsevthin nt_wm_sev_anem nt_wm_micro_iron* No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast min_diet_diversity new_No_min_diet_diversity_hh nt_mdd min_meal_freq_bf_inf min_meal_freq_bf_child rural_prop dummy_wmhead_unempl temp_rollMean* prec_rollMean* dummy_tmax*_pos dummy_rain*_neg"
+/*
+glo vars "rural_prop agri_land_hhds hh_head_primary  share_wmhead_unempl stunted_ch maize_uga battles_present_number_of_confli battles_future_number_of_conflic temp_rollMean* prec_rollMean*" 
 
 tabstat $vars, stat(count mean sd max min) columns(statistics) format(%9.2f) 
 
-mat d = J(39, 5, .)
+mat d = J(16, 5, .)
 
 local j = 0
 foreach var of varlist $vars{
@@ -267,14 +277,14 @@ foreach var of varlist $vars{
 }
 
 mat colnames d = "Obs" "Mean" "SD" "Min" "Max" 
-*mat rownames d =  "Retail Maize prices (pesos/kg)"  "Violent Conflicts" "Future Violent Conflicts" "Cluster Gini Coeff." "Households Rural Share" "Women head Employed (dummy)" "12-Month Temp anomalies (dummy)" "9-Month Temp anomalies (dummy)" "6-Month Temp anomalies (dummy)" "3-Month Temp anomalies (dummy)" "12-Month Prec anomalies (dummy)" "9-Month Prec anomalies (dummy)" "6-Month Prec anomalies (dummy)" "3-Month Prec anomalies (dummy)"
+mat rownames d = "Share of Rural Households" "Share of HHDs with Agri Land" "Share of Primary Educated Heads" "Share of Women Heads Unemployed" "Share of Stunted Children" "Wholesale Maize prices (UGX/kg)" "Present No. of Conflicts (Battles)" "Future No. of Conflicts (Battles)" "3-Month Temp anomalies" "6-Month Temp anomalies" "9-Month Temp anomalies" "12-Month Temp anomalies" "3-Month Rainfall anomalies" "6-Month Rainfall anomalies" "9-Month Rainfall anomalies" "12-Month Rainfall anomalies"
 
 mat list d
 
 esttab matrix(d, fmt(2 2 2 2 2 ))  ///
 using "$results/Descriptive_Table.rtf", replace   ///
 addnotes("Source: Author's Calculations") ///
-title("TABLE 1. DESCRIPTIVE STATISTICS: MAIN VARIABLES OF INTEREST")
+title("DESCRIPTIVE STATISTICS: MAIN VARIABLES OF INTEREST")
 */
 
 *-------------------------------------------------------------------------------
