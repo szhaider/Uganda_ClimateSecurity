@@ -158,10 +158,11 @@ HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
 No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast min_diet_diversity   /// children diet and food nutrition No_min_meal_freq_hh Meal_freq_hh
 new_No_min_diet_diversity_hh nt_mdd min_meal_freq_bf_inf min_meal_freq_bf_child /// children diet and food nutrition
 new_dietary_diversity_* ///
-(sum) tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
+(sum) hhsum tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
 No_of_lowrohrer_w=tot_RI_Low_w No_of_lowBMI_w=DHS_tot_BMI_low_w No_of_anem_w=sev_mod_anemia_hh /// number of stunted, wasted, underweight , low rohrer women, 	low BMI women										
 (median) median_wealth_index_quintile=wealth_index median_wealth_index_score=wealth_index_score  ///
-[pw=wgt], by (dhsyear quarter region dhsclust latnum longnum )  // no. of regions goes down back in early years 
+(firstnm) sub_region ///
+[pw=wgt], by (dhsyear quarter  dhsclust latnum longnum region)  // no. of regions goes down back in early years 
 
 sort dhsyear dhsclust
 *-------------------------------------------------------------------------------
@@ -241,11 +242,13 @@ HH_with_rud_floor_material HH_with_improved_tiolet rural_prop  ///
 No_min_diet_diversity_hh  inf_min_breast not_inf_min_breast min_diet_diversity   /// 
 new_No_min_diet_diversity_hh nt_mdd min_meal_freq_bf_inf min_meal_freq_bf_child ///
 maize_uga maize_usd /// maize prices 
-(sum) tot_* No_of_stunt No_of_wast No_of_undw No_of_anemic ///
+(sum) hhsum tot_* No_of_stunt No_of_wast No_of_undw No_of_anemic ///
 No_of_lowrohrer_w No_of_lowBMI_w No_of_anem_w *_present_* *_future_* /// 	 									
-(median) median_wealth_index_quintile median_wealth_index_score,  ///
-by(grid_id dhsyear quarter region )         //rural_urban
+(median) median_wealth_index_quintile median_wealth_index_score  ///
+(firstnm) sub_region, ///
+by(grid_id dhsyear quarter region)         //rural_urban
 
+order sub_region, after(quarter)
 
 *duplicates report grid_id dhsyear quarter region    //no repetitions  
 *------------------------------------------------------------------------

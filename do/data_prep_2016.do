@@ -947,7 +947,9 @@ replace pov_hd_bot_40 = . if missing(wealth_index)
 gen year=2016
 
 
-collapse hv003 hv005 hv007 hv021 hv022 hv023 hv006 hv008 hv009 type_place region hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 hv244 hv245 year wealth_index wealth_index_score  hv219 hv220 hv209 hv210 hv211 hv212  hv221  popwt   wat_avl_prms pov_hd_bot_20 pov_hd_bot_40, by (hhid v001 v002 )
+decode region, gen(sub_region)
+
+collapse (mean) hv003 hv005 hv007 hv021 hv022 hv023 hv006 hv008 hv009 type_place region  hv204 hv205 hv206 hv207 hv208 hv201 hv213 hv214 hv215 hv244 hv245 year wealth_index wealth_index_score  hv219 hv220 hv209 hv210 hv211 hv212  hv221  popwt   wat_avl_prms pov_hd_bot_20 pov_hd_bot_40 (sum) hhsum=hv009 (firstnm) sub_region, by (hhid v001 v002 )
 
 sort hhid 
 
