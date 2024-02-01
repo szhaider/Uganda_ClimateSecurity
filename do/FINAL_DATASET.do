@@ -161,7 +161,6 @@ new_dietary_diversity_* ///
 (sum) hhsum tot_* No_of_stunt=stunting_c_hh No_of_wast=wasted_c_hh No_of_undw=underwht_ch_hh No_of_anemic=anemia_ch_hh ///
 No_of_lowrohrer_w=tot_RI_Low_w No_of_lowBMI_w=DHS_tot_BMI_low_w No_of_anem_w=sev_mod_anemia_hh /// number of stunted, wasted, underweight , low rohrer women, 	low BMI women										
 (median) median_wealth_index_quintile=wealth_index median_wealth_index_score=wealth_index_score  ///
-(firstnm) sub_region ///
 [pw=wgt], by (dhsyear quarter  dhsclust latnum longnum region)  // no. of regions goes down back in early years 
 
 sort dhsyear dhsclust
@@ -208,22 +207,51 @@ label var share_protests_f "Future protests - dummy"
 *-------------------------------------------------------------------------------
 *Merging Grid level Data
 
-*Importing grid ids after creation in qgis 
-/* 
+*Importing grid ids after creation in qgis (Now saving new file Final_Grid_New)
+/*
 *GRID csv converted to dta after QGIS algorithms   - PANEL Structure Given
-	*import delimited "$qgis/Final_Grid.csv", clear
-	*sort id dhsyear
-	*save "$results/Final_Grid.dta", replace
+	import delimited "$qgis/Final_Grid_New.csv", clear
+	sort id dhsyear
+	save "$results/Final_Grid_New.dta", replace
 */
 
-merge 1:1 dhsclust dhsyear quarter  using "$results/Final_Grid.dta" , keep(3) nogen   //All matched  (275 unmatched for dhsyear 2000 since it is dropped with prices)
+*merge 1:1 dhsclust dhsyear quarter  using "$results/Final_Grid.dta" , keep(3) nogen   //All matched  (275 unmatched for dhsyear 2000 since it is dropped with prices)
+
+*Using new grid based on new shapefile of Uganda wiht 4 admin1. Previously I was using older version (02/01/24). New grid ids are dif because of new shape file so just updating. All matched since no 2000
+merge 1:1 dhsclust dhsyear quarter  using "$results/Final_Grid_New.dta" , keep(3) nogen
 
 rename id grid_id
 order grid_id
 sort grid_id dhsyear dhsclust quarter
 
 drop if grid_id == .			  //The grid_ids where no dhscluster got overlayed  = 1obs
-unique grid_id  				 //380 unique ids
+unique grid_id  				 //380 unique ids  , New 369 uniques IDS
+
+************************
+*Drop Region and Subregion, since these are not consistent in DHS rounds across years. We have made our own region variable with GIS techniques
+
+* i.e. We overlayed the admin 1 shape file. Then we created a Grid and clipped it. Then we estimated the centroids of each clipped grid.
+* Finally we matched the Admin 1 polygons with centroids of the Clipped grid with the QGIS algorithm i.e. Jion attributes by location.
+
+* We save the final file in the respective foder to bring in our own region variable, 
+* which is Mapping each Grid id to respective region as given in shapefile (admin1)
+* This mapping is consistent across years to control for region F.E.s in the regressions (to account for unobservables) 
+*Importing grid ids after creation in qgis (Now saving new file Final_Grid_New)
+
+/*
+*Region New csv converted to dta after QGIS algorithms   
+	import delimited "$qgis/RegionAdmin1_New.csv", clear
+	sort id 
+	rename id grid_id
+	keep grid_id adm1_en
+	save "$results/RegionAdmin1_New.dta", replace
+*/
+
+*drop region //To bring in our adm1_en variable
+merge m:1 grid_id using "$results/RegionAdmin1_New.dta", keep(3) nogen
+
+order adm1_en, after(dhsclust)
+
 
 ***************************Grid level collapse**********************************
 
@@ -245,10 +273,10 @@ maize_uga maize_usd /// maize prices
 (sum) hhsum tot_* No_of_stunt No_of_wast No_of_undw No_of_anemic ///
 No_of_lowrohrer_w No_of_lowBMI_w No_of_anem_w *_present_* *_future_* /// 	 									
 (median) median_wealth_index_quintile median_wealth_index_score  ///
-(firstnm) sub_region, ///
+(firstnm) adm1_en, ///
 by(grid_id dhsyear quarter region)         //rural_urban
 
-order sub_region, after(quarter)
+order adm1_en, after(quarter)
 
 *duplicates report grid_id dhsyear quarter region    //no repetitions  
 *------------------------------------------------------------------------
@@ -292,6 +320,9 @@ title("DESCRIPTIVE STATISTICS: MAIN VARIABLES OF INTEREST")
 
 *-------------------------------------------------------------------------------
 compress
+
+*-------------------------------------------------------------------------------
+
 
 *-------------------------------------------------------------------------------
 
